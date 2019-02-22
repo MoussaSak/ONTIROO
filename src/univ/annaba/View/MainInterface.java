@@ -9,6 +9,8 @@ import javax.swing.border.EmptyBorder;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
+import univ.annaba.Control.MyVisitor;
+
 import com.jgoodies.forms.factories.FormFactory;
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -21,6 +23,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 
 
@@ -34,7 +39,9 @@ public class MainInterface extends JFrame {
 	private JTextField textField_1;
 	private JTextField textField_2;
 	private JTextField sourceCodeField;
-	private String sourceCodeFilePath;
+	private JEditorPane conceptsPane;
+	private MyVisitor myVisitor;
+	private String sourceCodeFilePath ="";
 	private String chooserPath = "/home/moise/Documents/example/";
 	/**
 	 * Launch the application.
@@ -59,6 +66,9 @@ public class MainInterface extends JFrame {
 		setTitle("ONTIROO");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 961, 443);
+		
+		conceptsPane = new JEditorPane();
+		
 		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -192,13 +202,32 @@ public class MainInterface extends JFrame {
 		contentPane.add(btnGenerateMetrics, "16, 10");
 		
 		JButton btnGenerateConcepts = new JButton("Generate Concepts");
+		btnGenerateConcepts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				myVisitor = new MyVisitor();
+				String text="";
+				
+					try {
+						myVisitor.visitSourceCode(sourceCodeFilePath);
+						ArrayList<String> variables = myVisitor.getVariables();
+						for (int i = 0; i < variables.size(); i++) {
+							text += variables.get(i)+"\n";
+						}
+						conceptsPane.setText(text);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					
+								
+				
+			}
+		});
 		contentPane.add(btnGenerateConcepts, "20, 10");
 		
 		JEditorPane editorPane_1 = new JEditorPane();
 		contentPane.add(editorPane_1, "16, 12, fill, fill");
 		
-		JEditorPane editorPane = new JEditorPane();
-		contentPane.add(editorPane, "20, 12, fill, fill");
+		contentPane.add(conceptsPane, "20, 12, fill, fill");
 		
 		textField_1 = new JTextField();
 		contentPane.add(textField_1, "16, 14, 5, 1, fill, default");

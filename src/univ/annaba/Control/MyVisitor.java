@@ -33,10 +33,10 @@ import univ.annaba.Control.JavaParser.MyVariableNameContext;
 @SuppressWarnings("deprecation")
 public class MyVisitor extends JavaBaseVisitor<Void> {
 
-	static ArrayList<String> methods = new ArrayList<String>();
-	static ArrayList<String> variables = new ArrayList<String>();
-	static ArrayList<String> classes = new ArrayList<String>();
-	static ArrayList<String> packagee = new ArrayList<String>();
+	protected ArrayList<String> methods = new ArrayList<String>();
+	protected ArrayList<String> variables = new ArrayList<String>();
+	protected ArrayList<String> classes = new ArrayList<String>();
+	protected ArrayList<String> packages = new ArrayList<String>();
 	protected String ontologyPath = "/home/moise/Documents/example/OntoCode.owl";
 	protected String ontologyURI = "http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#";
 
@@ -63,63 +63,44 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 		ontology.read(in, "", "RDF/XML");
 		return ontology;
 	}
-
+	
 	@Override
 	public Void visitMyPackageName(MyPackageNameContext ctx) {
 		String m = ctx.getText();
-
-		OntModel ontology = readOntology();
-		packagee.add(m);
-		Iterator<String> i = packagee.iterator();
-		while (i.hasNext()) {
-			String d = (String) i.next();
-			System.out.println("package  : " + d);
-			String URI = ontologyURI;
-			OntClass packagee = ontology.getOntClass(ontologyURI);
-			ontology.createIndividual(URI + d, packagee);
-		}
+		
+		OntModel ontology = this.addOntologyElement(m, packages);
 		this.writeOntology(ontology);
 		return super.visitMyPackageName(ctx);
+	}
+
+	public OntModel addOntologyElement(String element, ArrayList<String> concepts) {
+		
+		OntModel ontology = this.readOntology();
+		
+		concepts.add(element);
+		Iterator<String> i = concepts.iterator();
+		while (i.hasNext()) {
+			String d = (String) i.next();
+			String URI = ontologyURI;
+			OntClass ontClass = ontology.getOntClass(ontologyURI);
+			ontology.createIndividual(URI + d, ontClass);
+		}
+		return ontology;
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	public Void visitMyMethodName(MyMethodNameContext ctx) {
 		String a = ctx.getText();
-
-		OntModel ontology = readOntology();
-
-		System.out.println("method  : " + a);
-		methods.add(a);
-		Iterator<String> i = methods.iterator();
-		while (i.hasNext()) {
-			String x = (String) i.next();
-
-			String URI = ontologyURI;
-			OntClass method = ontology.getOntClass(ontologyURI + "Method");
-			ontology.createIndividual(URI + x, method);
-		}
-
-		writeOntology(ontology);
+		OntModel ontology = this.addOntologyElement(a, methods);
+		this.writeOntology(ontology);
 		return super.visitMyMethodName(ctx);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	public Void visitMyClassName(MyClassNameContext ctx) {
 		String a = ctx.getText();
-		OntModel ontology = readOntology();
-
-		System.out.println("Class  : " + a);
-
-		classes.add(a);
-		Iterator<String> i = classes.iterator();
-		while (i.hasNext()) {
-			String g = (String) i.next();
-
-			String URI = ontologyURI;
-			OntClass Classs = ontology.getOntClass(ontologyURI + "Classs");
-			ontology.createIndividual(URI + g, Classs);
-		}
-		writeOntology(ontology);
+		OntModel ontology = this.addOntologyElement(a, classes);
+		this.writeOntology(ontology);
 		return super.visitMyClassName(ctx);
 
 	}
@@ -127,30 +108,19 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 	////////////////////////////////////////////////////////////////////////////////////
 	public Void visitMyVariableName(MyVariableNameContext ctx) {
 		String b = ctx.getText();
-
-		System.out.println("variable : " + ctx.getText());
-
-		OntModel ontology = ModelFactory.createOntologyModel();
-		String inputFileName = ontologyPath;
-		// use the FileManager to find the input file
-		InputStream in = FileManager.get().open(inputFileName);
-		if (in == null) {
-			throw new IllegalArgumentException("File: " + inputFileName + " not found");
-		}
-		ontology.read(in, "", "RDF/XML");
-		variables.add(b);
-		Iterator<String> i = variables.iterator();
-		while (i.hasNext()) {
-			String f = (String) i.next();
-
-			String URI = ontologyURI;
-			OntClass variable = ontology.getOntClass(ontologyURI + "Variable");
-			ontology.createIndividual(URI + f, variable);
-		}
-
-		writeOntology(ontology);
-
+		OntModel ontology = this.addOntologyElement(b, variables);
+		this.writeOntology(ontology);
 		return super.visitMyVariableName(ctx);
+	}
+	
+	public void visitSourceCode(String sourceCodePath) throws FileNotFoundException, IOException {
+		ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(sourceCodePath)); // Parse this file
+		JavaLexer lexer = new JavaLexer(input);
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		JavaParser parser = new JavaParser(tokens);
+		ParseTree tree = parser.compilationUnit();
+		this.visit(tree);
+		System.out.println("been executed"+ this);
 	}
 	/*
 	 * public Void visitPrimitiveType(PrimitiveTypeContext ctx) {
@@ -164,41 +134,41 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 	 * super.visitClassOrInterfaceModifier(ctx); }
 	 */
 
-	public static ArrayList<String> getMethods() {
+	public ArrayList<String> getMethods() {
 		return methods;
 	}
 
-	public static void setMethods(ArrayList<String> methods) {
-		MyVisitor.methods = methods;
+	public void setMethods(ArrayList<String> methods) {
+		this.methods = methods;
 	}
 
-	public static ArrayList<String> getVariables() {
+	public  ArrayList<String> getVariables() {
 		return variables;
 	}
 
-	public static void setVariables(ArrayList<String> variables) {
-		MyVisitor.variables = variables;
+	public void setVariables(ArrayList<String> variables) {
+		this.variables = variables;
 	}
 
-	public static ArrayList<String> getClasses() {
+	public ArrayList<String> getClasses() {
 		return classes;
 	}
 
-	public static void setClasses(ArrayList<String> classes) {
-		MyVisitor.classes = classes;
+	public void setClasses(ArrayList<String> classes) {
+		this.classes = classes;
 	}
 
-	public static ArrayList<String> getPackagee() {
-		return packagee;
+	public ArrayList<String> getPackagee() {
+		return packages;
 	}
 
-	public static void setPackagee(ArrayList<String> packagee) {
-		MyVisitor.packagee = packagee;
+	public void setPackagee(ArrayList<String> packagee) {
+		this.packages = packagee;
 	}
 
 	public static void main(String[] args) throws IOException {
 
-		String javaExampleURI = "/home/moise/Documents/example/Application.java";
+		String javaExampleURI = "/home/moise/Documents/example/HelloWorld.java";
 
 		ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(javaExampleURI)); // Parse this file
 
@@ -210,5 +180,8 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 		ParseTree tree = parser.compilationUnit(); // point de d�part de l'analyse de fichier
 		MyVisitor visitor = new MyVisitor();
 		visitor.visit(tree);
+		for (int i = 0; i < visitor.getVariables().size(); i++) {
+			System.out.println("am the main "+visitor.getVariables().get(i).toString());
+		}
 	}
 }

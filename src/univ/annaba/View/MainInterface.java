@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
@@ -14,9 +15,13 @@ import java.awt.Font;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.awt.event.ActionEvent;
 
 
 public class MainInterface extends JFrame {
@@ -28,8 +33,9 @@ public class MainInterface extends JFrame {
 	private JPanel contentPane;
 	private JTextField textField_1;
 	private JTextField textField_2;
-	private JTextField textField_3;
-
+	private JTextField sourceCodeField;
+	private String sourceCodeFilePath;
+	private String chooserPath = "/home/moise/Documents/example/";
 	/**
 	 * Launch the application.
 	 */
@@ -160,13 +166,26 @@ public class MainInterface extends JFrame {
 		lblDetectingRefactoringOpportunities.setFont(new Font("Times New Roman", Font.PLAIN, 18));
 		contentPane.add(lblDetectingRefactoringOpportunities, "18, 2");
 		
-		textField_3 = new JTextField();
-		contentPane.add(textField_3, "16, 6, 5, 1, fill, default");
-		textField_3.setColumns(10);
+		sourceCodeField = new JTextField();
+		contentPane.add(sourceCodeField, "16, 6, 5, 1, fill, default");
+		sourceCodeField.setColumns(10);
 		
 		
 		
 		JButton btnLoadCode = new JButton("Load Code");
+		btnLoadCode.addActionListener(new ActionListener() {
+
+			public void actionPerformed(ActionEvent arg0) {
+				
+			JFileChooser sourceCodeChooser = new JFileChooser(new File(chooserPath));
+			sourceCodeChooser.showOpenDialog(null);
+			File file = sourceCodeChooser.getSelectedFile();
+			if(file != null) {
+			sourceCodeFilePath = file.getAbsolutePath();
+			sourceCodeField.setText(sourceCodeFilePath);
+			}
+			}
+		});
 		contentPane.add(btnLoadCode, "26, 6");
 		
 		JButton btnGenerateMetrics = new JButton("Generate Metrics");

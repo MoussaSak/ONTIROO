@@ -1,9 +1,14 @@
 package univ.annaba.Model;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+
 
 import japa.parser.ast.body.ConstructorDeclaration;
+import japa.parser.ast.body.FieldDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
+import japa.parser.ast.body.VariableDeclarator;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 
 /**
@@ -17,6 +22,7 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 	private String constructors = "" ;
 	private String methods = "" ;
 	private Hashtable<String, String> body ;
+	private List<VariableDeclarator> fields ;
 
 	public Visitor() {
 		body = new Hashtable<String, String>();
@@ -47,6 +53,16 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 		}
 	}
 	
+	@Override
+	public void visit(FieldDeclaration n, Object arg) {
+		fields = new ArrayList<VariableDeclarator>();
+		if (n !=null) {
+			fields.addAll(n.getVariables());
+		}
+	}
+	
+	
+	
 	/**
 	 * gets the constructors 
 	 * @return array of string contains the constructors
@@ -69,6 +85,14 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 	 */
 	public Hashtable<String, String> getBody() {
 		return body;
+	}
+	
+	public List<VariableDeclarator> getFields() {
+		return fields;
+	}
+	
+	public void setFields(List<VariableDeclarator> fields) {
+		this.fields = fields;
 	}
 	
 }

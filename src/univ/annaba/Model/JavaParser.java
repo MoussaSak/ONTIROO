@@ -2,6 +2,7 @@ package univ.annaba.Model;
 
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
+import japa.parser.ast.body.VariableDeclarator;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -60,8 +61,17 @@ public class JavaParser extends Visitor {
         	visit(compilationUnit,null);
         	String methods = getConstructors()+getMethods();
         	String[] str = methods.split("\\.");
-        
+        	
         return str;
     }
 	
+	public  java.util.List<VariableDeclarator> parseFields(){
+		visit(compilationUnit,null);
+		java.util.List<VariableDeclarator> list = getFields();
+		return list;
+	}
+	
+	public static void main(String[] args) {
+		 
+	}
 }

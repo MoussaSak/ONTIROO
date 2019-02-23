@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import com.jgoodies.forms.layout.FormLayout;
@@ -11,9 +12,10 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 import univ.annaba.Control.MyVisitor;
 
-import com.jgoodies.forms.factories.FormFactory;
 import javax.swing.JLabel;
+
 import java.awt.Font;
+
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JEditorPane;
@@ -23,9 +25,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.awt.event.ActionEvent;
 
 
@@ -39,10 +41,13 @@ public class MainInterface extends JFrame {
 	private JTextField textField_1;
 	private JTextField textField_2;
 	private JTextField sourceCodeField;
-	private JEditorPane conceptsPane;
+	private JEditorPane conceptsEditorPane;
+	private JScrollPane sourceCodeScrollPane;
 	private MyVisitor myVisitor;
 	private String sourceCodeFilePath ="";
 	private String chooserPath = "/home/moise/Documents/example/";
+	private JScrollPane metricsScrollPane;
+	private JEditorPane metricsEditorPane;
 	/**
 	 * Launch the application.
 	 */
@@ -66,8 +71,6 @@ public class MainInterface extends JFrame {
 		setTitle("ONTIROO");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 961, 443);
-		
-		conceptsPane = new JEditorPane();
 		
 		
 		JMenuBar menuBar = new JMenuBar();
@@ -114,62 +117,63 @@ public class MainInterface extends JFrame {
 		
 		JMenuItem mntmAbout = new JMenuItem("About");
 		mnHelp.add(mntmAbout);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,},
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_COLSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_COLSPEC,},
 			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.DEFAULT_ROWSPEC,
+				com.jgoodies.forms.factories.FormFactory.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("default:grow"),}));
 		
 		JLabel lblDetectingRefactoringOpportunities = new JLabel("Detecting Refactoring Opportunities");
@@ -198,36 +202,49 @@ public class MainInterface extends JFrame {
 		});
 		contentPane.add(btnLoadCode, "26, 6");
 		
+		metricsScrollPane = new JScrollPane();
+		metricsEditorPane = new JEditorPane();
+		metricsScrollPane.setViewportView(metricsEditorPane);
+		contentPane.add(metricsScrollPane, "16, 12, fill, fill");
+		
 		JButton btnGenerateMetrics = new JButton("Generate Metrics");
+		btnGenerateMetrics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+			}
+		});
 		contentPane.add(btnGenerateMetrics, "16, 10");
 		
+		sourceCodeScrollPane = new JScrollPane();
+		conceptsEditorPane = new JEditorPane();
+		sourceCodeScrollPane.setViewportView(conceptsEditorPane);
+		contentPane.add(sourceCodeScrollPane, "20, 12, fill, fill");
+		
+		
+		
+
 		JButton btnGenerateConcepts = new JButton("Generate Concepts");
 		btnGenerateConcepts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				myVisitor = new MyVisitor();
 				String text="";
-				
 					try {
 						myVisitor.visitSourceCode(sourceCodeFilePath);
-						ArrayList<String> variables = myVisitor.getVariables();
-						for (int i = 0; i < variables.size(); i++) {
-							text += variables.get(i)+"\n";
-						}
-						conceptsPane.setText(text);
+						Hashtable<String,ArrayList<String>> conceptsReport = myVisitor.getConceptsReport();
+						
+						text = 	"Variables: " + conceptsReport.get("Variables").toString()+ "\n" +
+								"Methods: "+conceptsReport.get("Methods").toString()+ "\n" +
+								"Packages: " + conceptsReport.get("Packages").toString()+ "\n"+
+								"Classes: " + conceptsReport.get("Classes").toString() ;
+						conceptsEditorPane.setText(text);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					
-								
-				
+			
 			}
 		});
+		
 		contentPane.add(btnGenerateConcepts, "20, 10");
-		
-		JEditorPane editorPane_1 = new JEditorPane();
-		contentPane.add(editorPane_1, "16, 12, fill, fill");
-		
-		contentPane.add(conceptsPane, "20, 12, fill, fill");
 		
 		textField_1 = new JTextField();
 		contentPane.add(textField_1, "16, 14, 5, 1, fill, default");

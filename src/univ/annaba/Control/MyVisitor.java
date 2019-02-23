@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -63,20 +64,19 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 		ontology.read(in, "", "RDF/XML");
 		return ontology;
 	}
-	
+
 	@Override
 	public Void visitMyPackageName(MyPackageNameContext ctx) {
 		String m = ctx.getText();
-		
 		OntModel ontology = this.addOntologyElement(m, packages);
 		this.writeOntology(ontology);
 		return super.visitMyPackageName(ctx);
 	}
 
 	public OntModel addOntologyElement(String element, ArrayList<String> concepts) {
-		
+
 		OntModel ontology = this.readOntology();
-		
+
 		concepts.add(element);
 		Iterator<String> i = concepts.iterator();
 		while (i.hasNext()) {
@@ -90,16 +90,16 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	public Void visitMyMethodName(MyMethodNameContext ctx) {
-		String a = ctx.getText();
-		OntModel ontology = this.addOntologyElement(a, methods);
+		String m = ctx.getText();
+		OntModel ontology = this.addOntologyElement(m, methods);
 		this.writeOntology(ontology);
 		return super.visitMyMethodName(ctx);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////
 	public Void visitMyClassName(MyClassNameContext ctx) {
-		String a = ctx.getText();
-		OntModel ontology = this.addOntologyElement(a, classes);
+		String c = ctx.getText();
+		OntModel ontology = this.addOntologyElement(c, classes);
 		this.writeOntology(ontology);
 		return super.visitMyClassName(ctx);
 
@@ -107,12 +107,12 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 
 	////////////////////////////////////////////////////////////////////////////////////
 	public Void visitMyVariableName(MyVariableNameContext ctx) {
-		String b = ctx.getText();
-		OntModel ontology = this.addOntologyElement(b, variables);
+		String v = ctx.getText();
+		OntModel ontology = this.addOntologyElement(v, variables);
 		this.writeOntology(ontology);
 		return super.visitMyVariableName(ctx);
 	}
-	
+
 	public void visitSourceCode(String sourceCodePath) throws FileNotFoundException, IOException {
 		ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(sourceCodePath)); // Parse this file
 		JavaLexer lexer = new JavaLexer(input);
@@ -120,8 +120,14 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 		JavaParser parser = new JavaParser(tokens);
 		ParseTree tree = parser.compilationUnit();
 		this.visit(tree);
-		System.out.println("been executed"+ this);
 	}
+
+	public Hashtable<String, ArrayList<String>> getConceptsReport() {
+		Hashtable<String, ArrayList<String>> hashtable = new Hashtable<String, ArrayList<String>>();
+		hashtable.put("Packages", packages);hashtable.put("Classes", classes);hashtable.put("Methods", methods);hashtable.put("Variables", variables);
+		return hashtable;
+	}
+	
 	/*
 	 * public Void visitPrimitiveType(PrimitiveTypeContext ctx) {
 	 * System.out.println("variable type : " + ctx.getText()); return
@@ -142,7 +148,7 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 		this.methods = methods;
 	}
 
-	public  ArrayList<String> getVariables() {
+	public ArrayList<String> getVariables() {
 		return variables;
 	}
 
@@ -158,11 +164,11 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 		this.classes = classes;
 	}
 
-	public ArrayList<String> getPackagee() {
+	public ArrayList<String> getPackages() {
 		return packages;
 	}
 
-	public void setPackagee(ArrayList<String> packagee) {
+	public void setPackages(ArrayList<String> packagee) {
 		this.packages = packagee;
 	}
 
@@ -180,8 +186,8 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 		ParseTree tree = parser.compilationUnit(); // point de d�part de l'analyse de fichier
 		MyVisitor visitor = new MyVisitor();
 		visitor.visit(tree);
-		for (int i = 0; i < visitor.getVariables().size(); i++) {
-			System.out.println("am the main "+visitor.getVariables().get(i).toString());
-		}
+		Hashtable<String, ArrayList<String>> hashtable = visitor.getConceptsReport();
+		System.out.println(hashtable.get("Variables"));
+
 	}
 }

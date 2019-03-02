@@ -7,6 +7,7 @@ import japa.parser.ast.body.VariableDeclarator;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * the {@code JavaParser} class handles the java file  source it makes a static 
@@ -65,13 +66,14 @@ public class JavaParser extends Visitor {
         return str;
     }
 	
-	public  java.util.List<VariableDeclarator> parseFields(){
-		visit(compilationUnit,null);
-		java.util.List<VariableDeclarator> list = getFields();
-		return list;
+	public  List<VariableDeclarator> parseFields() {
+		visit(compilationUnit, null);
+		List<VariableDeclarator> fields = getFields();
+		return fields;
 	}
 	
 	public static void main(String[] args) {
-		 
-	}
+		
+	
+		}
 }

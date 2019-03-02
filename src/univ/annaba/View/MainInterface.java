@@ -7,10 +7,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
+
+
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
-import univ.annaba.Control.MyVisitor;
+
+import univ.annaba.Control.MainInterfaceController;
 
 import javax.swing.JLabel;
 
@@ -25,9 +28,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
 import java.awt.event.ActionEvent;
 
 
@@ -43,11 +43,13 @@ public class MainInterface extends JFrame {
 	private JTextField sourceCodeField;
 	private JEditorPane conceptsEditorPane;
 	private JScrollPane sourceCodeScrollPane;
-	private MyVisitor myVisitor;
+	private MainInterfaceController controller;
 	private String sourceCodeFilePath ="";
 	private String chooserPath = "/home/moise/Documents/example/";
 	private JScrollPane metricsScrollPane;
 	private JEditorPane metricsEditorPane;
+	protected String ontologyPath = "/home/moise/Documents/example/codeOntology.owl";
+	protected String ontologyURI = "http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#";
 	/**
 	 * Launch the application.
 	 */
@@ -210,7 +212,7 @@ public class MainInterface extends JFrame {
 		JButton btnGenerateMetrics = new JButton("Generate Metrics");
 		btnGenerateMetrics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+
 			}
 		});
 		contentPane.add(btnGenerateMetrics, "16, 10");
@@ -226,22 +228,14 @@ public class MainInterface extends JFrame {
 		JButton btnGenerateConcepts = new JButton("Generate Concepts");
 		btnGenerateConcepts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				myVisitor = new MyVisitor();
+				controller = new MainInterfaceController();
 				String text="";
-					try {
-						myVisitor.visitSourceCode(sourceCodeFilePath);
-						Hashtable<String,ArrayList<String>> conceptsReport = myVisitor.getConceptsReport();
-						
-						text = 	"Variables: " + conceptsReport.get("Variables").toString()+ "\n" +
-								"Methods: "+conceptsReport.get("Methods").toString()+ "\n" +
-								"Packages: " + conceptsReport.get("Packages").toString()+ "\n"+
-								"Classes: " + conceptsReport.get("Classes").toString() ;
+						text = controller.generateConceptsReport(sourceCodeFilePath);
 						conceptsEditorPane.setText(text);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
 			
 			}
+
+		
 		});
 		
 		contentPane.add(btnGenerateConcepts, "20, 10");

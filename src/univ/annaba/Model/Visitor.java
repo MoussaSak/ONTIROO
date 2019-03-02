@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import japa.parser.ast.body.Parameter;
 
 import japa.parser.ast.body.ConstructorDeclaration;
 import japa.parser.ast.body.FieldDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.VariableDeclarator;
+import japa.parser.ast.expr.ClassExpr;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 
 /**
@@ -22,11 +24,22 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 	private String constructors = "" ;
 	private String methods = "" ;
 	private Hashtable<String, String> body ;
-	private List<VariableDeclarator> fields ;
+	private Hashtable<String, Integer> mloc;
+	private List<VariableDeclarator>  fields;
+	private Hashtable<String,List<Parameter> > parameters;
+	private int NOF;
+	private int NOL;
+	
+
+	
 
 	public Visitor() {
 		body = new Hashtable<String, String>();
-		
+		mloc = new Hashtable<String, Integer>();
+		fields = new ArrayList<VariableDeclarator>();
+		parameters = new Hashtable<String, List<Parameter>>();
+		setNOF(0);
+		setNOL(0);
 	}
 	
 	/**
@@ -34,10 +47,13 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 	 */
 	@Override
 	public void visit(MethodDeclaration n, Object arg) {
-		// TODO Auto-generated method stub
+		int MLOC=0;
 		if (n.getName()!=null) {
 			methods += n.getName()+"." ;
 			body.put(n.getName(), n.getBody().toString());
+			MLOC = (n.getEndLine()) - ( n.getBeginLine());
+			mloc.put(n.getName(), MLOC);
+			parameters.put(n.getName(),n.getParameters());
 		}
 	}
 	
@@ -46,22 +62,26 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 	 */
 	@Override
 	public void visit(ConstructorDeclaration n, Object arg) {
-		// TODO Auto-generated method stub
+		int MLOC=0;
 		if(n.getName()!=null){
 			constructors += n.getName()+"." ;
 			body.put(n.getName(), n.getBlock().toString());
+			MLOC = (n.getEndLine()) - ( n.getBeginLine());
+			mloc.put(n.getName(), MLOC);
 		}
 	}
 	
 	@Override
-	public void visit(FieldDeclaration n, Object arg) {
-		fields = new ArrayList<VariableDeclarator>();
-		if (n !=null) {
-			fields.addAll(n.getVariables());
-		}
+	public void visit(ClassExpr n, Object arg) {
+		// TODO Auto-generated method stub
+		NOL = n.getEndLine();
 	}
 	
-	
+	@Override
+	public void visit(FieldDeclaration n, Object arg) {
+		fields.addAll(n.getVariables());
+		setNOF(fields.size());
+	}
 	
 	/**
 	 * gets the constructors 
@@ -87,7 +107,7 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 		return body;
 	}
 	
-	public List<VariableDeclarator> getFields() {
+	public  List<VariableDeclarator> getFields() {
 		return fields;
 	}
 	
@@ -95,4 +115,35 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 		this.fields = fields;
 	}
 	
+	public Hashtable<String, Integer> getMloc() {
+		return mloc;
+	}
+
+	public void setMloc(Hashtable<String, Integer> mloc) {
+		this.mloc = mloc;
+	}
+	
+	public Hashtable<String, List<Parameter>> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(Hashtable<String, List<Parameter>> parameters) {
+		this.parameters = parameters;
+	}
+
+	public int getNOF() {
+		return NOF;
+	}
+
+	public void setNOF(int nOF) {
+		NOF = nOF;
+	}
+	
+	public int getNOL() {
+		return NOL;
+	}
+
+	public void setNOL(int nOL) {
+		NOL = nOL;
+	}
 }

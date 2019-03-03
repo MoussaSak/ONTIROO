@@ -1,12 +1,15 @@
 package univ.annaba.Control;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -25,18 +28,29 @@ public class OntologyController {
 	}
 	
 	public void writeOntology( String ontologyOutPutPath) {
-		OutputStream out;
-		
+		OutputStream out = null;
 		OntModel ontology = ModelFactory.createOntologyModel();
-		ontology = this.addOntologyElements(ontologyPath, report);
+		try {
+			copyFileUsingStream(ontologyPath, ontologyOutPutPath);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		ontology = this.addOntologyElements(ontologyOutPutPath, report);
 		try {
 			out = new FileOutputStream(ontologyOutPutPath);
 			ontology.write(out, "RDF/XML");
 
 		} catch (FileNotFoundException e) {
-
 			e.printStackTrace();
+		}finally {
+			try {
+				out.close();
+				ontology.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		
 	}
 	
 	public OntModel readOntology(String ontologyInputPath) {
@@ -84,6 +98,12 @@ public class OntologyController {
 			return ontology;
 	}
 	
+	private static void copyFileUsingStream(String sourcePath, String destPath) throws IOException {
+		File source = new File(sourcePath);
+		File dest = new File(destPath);
+		FileUtils.copyFile(source, dest);
+	}
+	
 	
 	public MyVisitor getVisitor() {
 		return visitor;
@@ -99,5 +119,4 @@ public class OntologyController {
 	public void setOntologyPath(String ontologyPath) {
 		this.ontologyPath = ontologyPath;
 	}
-	
 }

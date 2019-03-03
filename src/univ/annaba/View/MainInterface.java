@@ -6,6 +6,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -230,10 +232,13 @@ public class MainInterface extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser chooser = new JFileChooser(new File(chooserPath));
 				String ontologyOutputPath= "" ;
+				FileFilter filter = new FileNameExtensionFilter("OWL File", ".owl");
+				chooser.setFileFilter(filter);
 				int rVal = chooser.showSaveDialog(null);
 				if (rVal == JFileChooser.APPROVE_OPTION) {
 					File file = chooser.getSelectedFile();
-					ontologyOutputPath = file.getPath();
+					String fileName = chooser.getSelectedFile().toString()+".owl";
+					ontologyOutputPath = file.getPath()+".owl";
 				}
 				 if (rVal == JFileChooser.CANCEL_OPTION) { }
 				controller.generateOntology(ontologyOutputPath);

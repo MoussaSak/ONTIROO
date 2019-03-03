@@ -6,12 +6,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.FileManager;
 
@@ -20,15 +17,18 @@ public class OntologyController {
 	protected MyVisitor visitor;
 	protected String ontologyPath = "/home/moise/Documents/example/OntoCode.owl";
 	protected String ontologyURI = "http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#";
+	protected Hashtable<String, ArrayList<String>> report;
 	
-	public OntologyController(MyVisitor myVisitor) {
-		visitor = myVisitor;
+	public OntologyController(MyVisitor visitor) {
+		this.visitor = visitor;
+		report = visitor.getConceptsReport();
 	}
 	
 	public void writeOntology( String ontologyOutPutPath) {
 		OutputStream out;
+		
 		OntModel ontology = ModelFactory.createOntologyModel();
-		ontology = this.buildOntology(ontology);
+		ontology = this.addOntologyElements(ontologyPath, report);
 		try {
 			out = new FileOutputStream(ontologyOutPutPath);
 			ontology.write(out, "RDF/XML");
@@ -49,9 +49,9 @@ public class OntologyController {
 		return ontology;
 	}
 	
-	public OntModel addOntologyElement(String ontologyPath, ArrayList<String> concepts) {
+	public OntModel addOntologyElements(String ontologyPath, Hashtable<String, ArrayList<String>> report) {
 		OntModel ontology = this.readOntology(ontologyPath);
-		Hashtable<String, ArrayList<String>> hash = visitor.getConceptsReport();
+		Hashtable<String, ArrayList<String>> hash = report;
 		
 		if (hash.containsKey("Methods")) {
 		ArrayList<String> methods = hash.get("Methods");
@@ -84,39 +84,6 @@ public class OntologyController {
 			return ontology;
 	}
 	
-	/**
-	public OntModel addOntologyMethods(String ontologyPath, ArrayList<String> methods) {
-		OntModel ontology = this.readOntology(ontologyPath);
-		Iterator<String> i = methods.iterator();
-		while (i.hasNext()) {
-			String method = (String) i.next();
-			OntClass ontClass =  ontology.getOntClass(ontology.getNsPrefixURI("")+"Method");
-			ontClass.createIndividual(ontologyURI+method);
-		}
-		return ontology;
-	}
-	
-	public OntModel addOntologyClasses(String ontologyPath, ArrayList<String> classes) {
-		OntModel ontology = this.readOntology(ontologyPath);
-		Iterator<String> i = classes.iterator();
-		while (i.hasNext()) {
-			String class1 = (String) i.next();
-			OntClass ontClass =  ontology.getOntClass(ontology.getNsPrefixURI("")+"Class");
-			ontClass.createIndividual(ontologyURI+class1);
-		}
-		return ontology;
-	}
-	*/
-	
-	public OntModel buildOntology(OntModel ontology){
-		
-		ontology = this.addOntologyElement(ontologyPath, visitor.getMethods());
-		//ontology = this.addOntologyElement(ontologyPath, visitor.getClasses(),"Classs");
-		//ontology = this.addOntologyElement(ontologyPath, visitor.getPackages(),"Package");
-		//ontology = this.addOntologyElement(ontologyPath, visitor.getVariables(),"Variable");
-
-		return ontology;
-	}
 	
 	public MyVisitor getVisitor() {
 		return visitor;
@@ -125,13 +92,12 @@ public class OntologyController {
 	public void setVisitor(MyVisitor visitor) {
 		this.visitor = visitor;
 	}
-	
-	public static void main(String[] args) {
-		String ontologyURI = "http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#";
-		MyVisitor myVisitor = new MyVisitor("/home/moise/Documents/example/HelloWorld.java");
-		OntologyController controller = new OntologyController(myVisitor);
-		OntModel model = controller.readOntology("/home/moise/Documents/example/OntoCode.owl");
-		controller.writeOntology("/home/moise/Documents/example/OntoCode.owl");
-	
+	public String getOntologyPath() {
+		return ontologyPath;
 	}
+
+	public void setOntologyPath(String ontologyPath) {
+		this.ontologyPath = ontologyPath;
+	}
+	
 }

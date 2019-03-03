@@ -7,6 +7,7 @@ import java.util.Hashtable;
 public class MainInterfaceController {
 	private MyVisitor myVisitor;
 	private Hashtable<String,ArrayList<String>> conceptsReport;
+	private OntologyController ontologyController;
 	
 	public MainInterfaceController() {
 	}
@@ -40,5 +41,11 @@ public class MainInterfaceController {
 		
 	}
 	
+	public void generateOntology(String ontologyOutPutPath){
+		if(myVisitor!= null){
+		ontologyController = new OntologyController(myVisitor);
+		}
+		ontologyController.writeOntology(ontologyOutPutPath);
+	}
 	
 }

@@ -182,12 +182,15 @@ public class MainInterface extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 
 				JFileChooser sourceCodeChooser = new JFileChooser(new File(chooserPath));
-				sourceCodeChooser.showOpenDialog(null);
-				File file = sourceCodeChooser.getSelectedFile();
-				if (file != null) {
+				FileFilter filter = new FileNameExtensionFilter("Java File", "java");
+				sourceCodeChooser.setFileFilter(filter);
+				int rVal = sourceCodeChooser.showOpenDialog(null);
+				if (rVal == JFileChooser.APPROVE_OPTION) {
+					File file = sourceCodeChooser.getSelectedFile();
 					sourceCodeFilePath = file.getAbsolutePath();
 					sourceCodeField.setText(sourceCodeFilePath);
 				}
+				 if (rVal == JFileChooser.CANCEL_OPTION) { }
 			}
 		});
 		contentPane.add(btnLoadCode, "26, 6");
@@ -200,7 +203,8 @@ public class MainInterface extends JFrame {
 		JButton btnGenerateMetrics = new JButton("Generate Metrics");
 		btnGenerateMetrics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-
+				String report = controller.generateMetricsReport();
+				metricsEditorPane.setText(report);
 			}
 		});
 		contentPane.add(btnGenerateMetrics, "16, 10");
@@ -232,13 +236,15 @@ public class MainInterface extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser chooser = new JFileChooser(new File(chooserPath));
 				String ontologyOutputPath= "" ;
-				FileFilter filter = new FileNameExtensionFilter("OWL File", ".owl");
+				FileFilter filter = new FileNameExtensionFilter("OWL File", "owl");
 				chooser.setFileFilter(filter);
 				int rVal = chooser.showSaveDialog(null);
 				if (rVal == JFileChooser.APPROVE_OPTION) {
 					File file = chooser.getSelectedFile();
-					String fileName = chooser.getSelectedFile().toString()+".owl";
-					ontologyOutputPath = file.getPath()+".owl";
+					if(file.getName().endsWith(".owl")) {
+						ontologyOutputPath = file.getPath();}
+					else {
+					ontologyOutputPath = file.getPath()+".owl";}
 				}
 				 if (rVal == JFileChooser.CANCEL_OPTION) { }
 				controller.generateOntology(ontologyOutputPath);

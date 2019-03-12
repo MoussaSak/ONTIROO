@@ -3,14 +3,14 @@ package univ.annaba.Model;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.ListIterator;
 
 import japa.parser.ast.body.Parameter;
-
 import japa.parser.ast.body.ConstructorDeclaration;
 import japa.parser.ast.body.FieldDeclaration;
 import japa.parser.ast.body.MethodDeclaration;
 import japa.parser.ast.body.VariableDeclarator;
-import japa.parser.ast.expr.ClassExpr;
+import japa.parser.ast.body.VariableDeclaratorId;
 import japa.parser.ast.visitor.VoidVisitorAdapter;
 
 /**
@@ -25,7 +25,7 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 	private String methods = "" ;
 	private Hashtable<String, String> body ;
 	private Hashtable<String, Integer> mloc;
-	private List<VariableDeclarator>  fields;
+	private List<VariableDeclaratorId>  fields;
 	private Hashtable<String,List<Parameter> > parameters;
 	private int NOF;
 	private int NOL;
@@ -36,11 +36,12 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 	public Visitor() {
 		body = new Hashtable<String, String>();
 		mloc = new Hashtable<String, Integer>();
-		fields = new ArrayList<VariableDeclarator>();
+		fields = new ArrayList<VariableDeclaratorId>();
 		parameters = new Hashtable<String, List<Parameter>>();
 		setNOF(0);
 		setNOL(0);
 	}
+
 	
 	/**
 	 * visits the Methods on the source file
@@ -53,8 +54,10 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 			body.put(n.getName(), n.getBody().toString());
 			MLOC = (n.getEndLine()) - ( n.getBeginLine());
 			mloc.put(n.getName(), MLOC);
+			if(n.getParameters()!=null)
 			parameters.put(n.getName(),n.getParameters());
 		}
+		super.visit(n, arg);
 	}
 	
 	/**
@@ -69,19 +72,22 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 			MLOC = (n.getEndLine()) - ( n.getBeginLine());
 			mloc.put(n.getName(), MLOC);
 		}
-	}
-	
-	@Override
-	public void visit(ClassExpr n, Object arg) {
-		// TODO Auto-generated method stub
-		NOL = n.getEndLine();
+		super.visit(n, arg);
 	}
 	
 	@Override
 	public void visit(FieldDeclaration n, Object arg) {
-		fields.addAll(n.getVariables());
+		
+		ListIterator<VariableDeclarator> iterator = n.getVariables().listIterator();
+		while(iterator.hasNext()) {
+			VariableDeclarator var = iterator.next();
+			fields.add(var.getId());
+		}
 		setNOF(fields.size());
+		super.visit(n, arg);
 	}
+	
+	
 	
 	/**
 	 * gets the constructors 
@@ -107,11 +113,11 @@ public class Visitor extends VoidVisitorAdapter<Object> {
 		return body;
 	}
 	
-	public  List<VariableDeclarator> getFields() {
+	public  List<VariableDeclaratorId> getFields() {
 		return fields;
 	}
 	
-	public void setFields(List<VariableDeclarator> fields) {
+	public void setFields(List<VariableDeclaratorId> fields) {
 		this.fields = fields;
 	}
 	

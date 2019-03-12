@@ -2,7 +2,8 @@ package univ.annaba.Model;
 
 import japa.parser.ParseException;
 import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.body.VariableDeclarator;
+import japa.parser.ast.body.ClassOrInterfaceDeclaration;
+import japa.parser.ast.body.VariableDeclaratorId;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,10 +20,10 @@ public class JavaParser extends Visitor {
 	private String path;
 	private FileInputStream fileInputStream;
 	private CompilationUnit compilationUnit;
+
 	
 	public JavaParser(String path) {
 		this.path = path;
-		
 		init();
 	}
 	
@@ -52,6 +53,7 @@ public class JavaParser extends Visitor {
 				e.printStackTrace();
 			}
         }
+	    visit(compilationUnit,null);
 	}
 	
 	/**
@@ -66,14 +68,22 @@ public class JavaParser extends Visitor {
         return str;
     }
 	
-	public  List<VariableDeclarator> parseFields() {
+	public  List<VariableDeclaratorId> parseFields() {
 		visit(compilationUnit, null);
-		List<VariableDeclarator> fields = getFields();
+		List<VariableDeclaratorId> fields = getFields();
 		return fields;
 	}
 	
-	public static void main(String[] args) {
-		
+	@Override
+	public void visit(ClassOrInterfaceDeclaration n, Object arg) {
+		setNOL(n.getEndLine());
+		super.visit(n, arg);
+	}
 	
+	public static void main(String[] args) {
+		JavaParser parser= new JavaParser("/home/moise/Documents/example/Application.java");
+		System.out.println(parser.parseMethods());
+		System.out.println(parser.getNOF());
+		
 		}
 }

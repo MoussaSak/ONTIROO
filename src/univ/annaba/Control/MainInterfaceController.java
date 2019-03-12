@@ -3,11 +3,15 @@ package univ.annaba.Control;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import univ.annaba.Model.MetricsParser;
+
 
 public class MainInterfaceController {
 	private MyVisitor myVisitor;
+	
 	private Hashtable<String,ArrayList<String>> conceptsReport;
 	private OntologyController ontologyController;
+	private String metricsPath = "/home/moise/Documents/example/Metrics";
 	
 	public MainInterfaceController() {
 	}
@@ -25,6 +29,18 @@ public class MainInterfaceController {
 		return text;
 	}
 	
+	public String generateMetricsReport() {
+		String txt;
+		MetricsParser parser = new MetricsParser(metricsPath);
+		txt= "Mloc: "+ parser.getMetricNameAndValue("MLOC").toString()+"\n"+
+				"NOF: "+parser.getMetricNameAndValue("NOF").toString()+"\n"+
+				"TLOC: "+parser.getMetricNameAndValue("TLOC").toString()+"\n"+
+				"Methods with Parameters: "+parser.getMetricNameAndValue("PAR").toString()+"\n"+
+				"VG: "+parser.getMetricNameAndValue("VG").toString()+"\n"+
+				"DIT"+ parser.getMetricNameAndValue("DIT").toString();
+		return txt;
+	}
+	
 	public String getElements(String element) {
 		String variables = "";
 		ArrayList<String> varConcepts = conceptsReport.get(element);
@@ -32,13 +48,6 @@ public class MainInterfaceController {
 			variables += conceptsReport.get(element).get(i)+"\n";
 		}
 		return variables;
-	}
-	
-	public MetricsReport generateMetricsReport() {
-		MetricsReport metricsReport = new MetricsReport();
-		metricsReport.setLOC(1);
-		return metricsReport;
-		
 	}
 	
 	public void generateOntology(String ontologyOutPutPath){

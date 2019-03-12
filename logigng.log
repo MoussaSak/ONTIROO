@@ -5,3 +5,6 @@
 2019-02-27 13:39:33 ERROR riot:84 - Premature end of file.
 2019-02-27 13:41:29 ERROR riot:84 - [line: 153, col: 116] XML document structures must start and end within the same entity.
 2019-02-27 13:43:13 ERROR riot:84 - Premature end of file.
+2019-03-04 10:49:51 ERROR riot:84 - [line: 1, col: 1 ] Content is not allowed in prolog.
+2019-03-07 10:11:42 ERROR riot:84 - [line: 1, col: 1 ] Content is not allowed in prolog.
+2019-03-07 10:45:33 ERROR riot:84 - [line: 1, col: 1 ] Content is not allowed in prolog.

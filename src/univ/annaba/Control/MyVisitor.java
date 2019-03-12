@@ -10,7 +10,6 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-
 import univ.annaba.Control.JavaParser.MyClassNameContext;
 import univ.annaba.Control.JavaParser.MyMethodNameContext;
 import univ.annaba.Control.JavaParser.MyPackageNameContext;
@@ -31,6 +30,7 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 	protected ArrayList<String> classes = new ArrayList<String>();
 	protected ArrayList<String> packages = new ArrayList<String>();
 	protected String sourceCodePath;
+	
 	
 	public MyVisitor(String sourceCodePath) {
 		this.sourceCodePath = sourceCodePath;
@@ -61,6 +61,7 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 	/////////////////////////////////////////////////////////////////////////////////////
 	public Void visitMyMethodName(MyMethodNameContext ctx) {
 		String m = ctx.getText();
+		ctx.getStart();
 		methods.add(m);
 		return super.visitMyMethodName(ctx);
 	}
@@ -124,5 +125,6 @@ public class MyVisitor extends JavaBaseVisitor<Void> {
 
 		MyVisitor visitor = new MyVisitor("/home/moise/Documents/example/HelloWorld.java");
 		System.out.println(visitor.getMethods());
+		
 	}
 }

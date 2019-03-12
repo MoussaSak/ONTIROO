@@ -12,6 +12,7 @@ public class MainInterfaceController {
 	private Hashtable<String,ArrayList<String>> conceptsReport;
 	private OntologyController ontologyController;
 	private String metricsPath = "/home/moise/Documents/example/Metrics";
+	static MetricsParser parser;
 	
 	public MainInterfaceController() {
 	}
@@ -31,7 +32,7 @@ public class MainInterfaceController {
 	
 	public String generateMetricsReport() {
 		String txt;
-		MetricsParser parser = new MetricsParser(metricsPath);
+		parser = new MetricsParser(metricsPath);
 		txt= "Mloc: "+ parser.getMetricNameAndValue("MLOC").toString()+"\n"+
 				"NOF: "+parser.getMetricNameAndValue("NOF").toString()+"\n"+
 				"TLOC: "+parser.getMetricNameAndValue("TLOC").toString()+"\n"+
@@ -40,6 +41,7 @@ public class MainInterfaceController {
 				"DIT"+ parser.getMetricNameAndValue("DIT").toString();
 		return txt;
 	}
+	
 	
 	public String getElements(String element) {
 		String variables = "";
@@ -50,11 +52,31 @@ public class MainInterfaceController {
 		return variables;
 	}
 	
-	public void generateOntology(String ontologyOutPutPath){
+	public void generateOntology(String ontologyOutputPath){
 		if(myVisitor!= null){
 		ontologyController = new OntologyController(myVisitor);
 		}
-		ontologyController.writeOntology(ontologyOutPutPath);
+		ontologyController.writeOntologyConcepts(ontologyOutputPath);
+	}
+	
+	public void enrichOntology(String ontologyOutputPath){
+		if(ontologyController!= null){
+		ontologyController.writeOntologyMetrics(ontologyOutputPath);
+		}
+		}
+	
+	/**
+	 * @return the parser
+	 */
+	public MetricsParser getParser() {
+		return parser;
+	}
+
+	/**
+	 * @param parser the parser to set
+	 */
+	public void setParser(MetricsParser parser) {
+		MainInterfaceController.parser = parser;
 	}
 	
 }

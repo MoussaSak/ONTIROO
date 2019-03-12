@@ -38,12 +38,13 @@ public class MainInterface extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField ontologyTextField;
-	private JTextField textField_2;
+	private JTextField enrichOntologyTextField;
 	private JTextField sourceCodeField;
 	private JEditorPane conceptsEditorPane;
 	private JScrollPane sourceCodeScrollPane;
 	private MainInterfaceController controller;
 	private String sourceCodeFilePath = "";
+	private String ontologyOutputPath = "";
 	private String chooserPath = "/home/moise/Documents/example/";
 	private JScrollPane metricsScrollPane;
 	private JEditorPane metricsEditorPane;
@@ -235,7 +236,6 @@ public class MainInterface extends JFrame {
 		btnDetectLongMethod.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser chooser = new JFileChooser(new File(chooserPath));
-				String ontologyOutputPath= "" ;
 				FileFilter filter = new FileNameExtensionFilter("OWL File", "owl");
 				chooser.setFileFilter(filter);
 				int rVal = chooser.showSaveDialog(null);
@@ -253,11 +253,17 @@ public class MainInterface extends JFrame {
 		});
 		contentPane.add(btnDetectLongMethod, "26, 14");
 
-		textField_2 = new JTextField();
-		contentPane.add(textField_2, "16, 16, 5, 1, fill, default");
-		textField_2.setColumns(10);
+		enrichOntologyTextField = new JTextField();
+		contentPane.add(enrichOntologyTextField, "16, 16, 5, 1, fill, default");
+		enrichOntologyTextField.setColumns(10);
 
 		JButton btnDetectDeadCode = new JButton("Enrich Code Ontology");
+		btnDetectDeadCode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				controller.enrichOntology(ontologyOutputPath);
+				enrichOntologyTextField.setText("Done! "+ontologyOutputPath);
+			}
+		});
 		contentPane.add(btnDetectDeadCode, "26, 16");
 
 		JButton btnGenerateBadSmells = new JButton("Generate Bad smells Ontology");

@@ -19,6 +19,7 @@ public class MetricsParser {
 	private List<String> attributeSource;
 	private List<String> attributePackage;
 	private Document document;
+	public int length;
 
 	public MetricsParser(String path) {
 		this.path = path;

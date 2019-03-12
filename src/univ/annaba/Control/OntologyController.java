@@ -10,10 +10,16 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.jena.ontology.DatatypeProperty;
+import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.util.FileManager;
+
+import univ.annaba.Model.MetricsParser;
 
 public class OntologyController {
 	protected OntModel ontology;
@@ -27,7 +33,7 @@ public class OntologyController {
 		report = visitor.getConceptsReport();
 	}
 	
-	public void writeOntology( String ontologyOutPutPath) {
+	public void writeOntologyConcepts( String ontologyOutPutPath) {
 		OutputStream out = null;
 		OntModel ontology = ModelFactory.createOntologyModel();
 		try {
@@ -53,8 +59,35 @@ public class OntologyController {
 		
 	}
 	
+	public void writeOntologyMetrics( String ontologyOutPutPath) {
+		OutputStream out = null;
+		OntModel ontology = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+		
+		try {
+			copyFileUsingStream(ontologyPath, ontologyOutPutPath);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		ontology = this.addOntologyMetrics(ontologyOutPutPath);
+		try {
+			out = new FileOutputStream(ontologyOutPutPath);
+			ontology.write(out, "RDF/XML");
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				out.close();
+				ontology.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
 	public OntModel readOntology(String ontologyInputPath) {
-		ontology = ModelFactory.createOntologyModel();
+		ontology = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
 		InputStream in = FileManager.get().open(ontologyInputPath);
 		if (in == null) {
 			throw new IllegalArgumentException("File: " + ontologyInputPath + " not found");
@@ -96,6 +129,25 @@ public class OntologyController {
 				}
 		}
 			return ontology;
+	}
+	
+	public OntModel addOntologyMetrics(String ontologyPath){
+		OntModel ontology = this.readOntology(ontologyPath);
+		MainInterfaceController controller = new MainInterfaceController();
+		MetricsParser metrics = controller.getParser();
+		Hashtable<String, Integer> hashtable = metrics.getMetricNameAndValue("MLOC");
+		String attributeName="";
+		Individual individual = null;
+		for (int i = 0; i < hashtable.size(); i++) {
+			attributeName = metrics.getAttributeName().get(i);
+			individual  = ontology.getIndividual(ontologyURI + attributeName);
+		
+			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + "MLOC");
+			int dataPropertyValue = hashtable.get(attributeName);
+			Literal literal = ontology.createTypedLiteral(dataPropertyValue);
+			individual.addProperty(dataProperty,literal);
+		}
+		return ontology;
 	}
 	
 	private static void copyFileUsingStream(String sourcePath, String destPath) throws IOException {

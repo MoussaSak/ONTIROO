@@ -15,8 +15,12 @@ import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.InfModel;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
+import org.apache.jena.reasoner.rulesys.Rule;
 import org.apache.jena.util.FileManager;
 
 import univ.annaba.Model.MetricsParser;
@@ -26,7 +30,16 @@ public class OntologyController {
 	protected MyVisitor visitor;
 	protected String ontologyPath = "/home/moise/Documents/example/OntoCode.owl";
 	protected String ontologyURI = "http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#";
+	protected String fanInRule = "/home/moise/Documents/example/rulefanin.txt";
+	protected String longMethodRule = "/home/moise/Documents/example/rule.txt";
+	protected String deadCodeOntologyURI = "/home/moise/Documents/example/deadCode.owl";
+	protected String longMethodOntologyURI = "/home/moise/Documents/example/Longmethod.owl";
+	
 	protected Hashtable<String, ArrayList<String>> report;
+	
+	public OntologyController() {
+		// TODO Auto-generated constructor stub
+	}
 	
 	public OntologyController(MyVisitor visitor) {
 		this.visitor = visitor;
@@ -58,17 +71,14 @@ public class OntologyController {
 	 */
 	public void writeOntologyMetrics( String ontologyOutPutPath) {
 		
-		OntModel ontology = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+		ontology = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
 		
 		try {
 			copyFileUsingStream(ontologyPath, ontologyOutPutPath);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		//ontology = this.addOntologyMetrics(ontologyOutPutPath,"MLOC");
-		ontology = this.addOntologyMetrics(ontologyOutPutPath,"VG");
-		//ontology = this.addOntologyMetrics(ontologyOutPutPath,"NOF");
-		//ontology = this.addOntologyMetrics(ontologyOutPutPath,"NOM");
+		ontology = this.addOntologyMetrics(ontologyOutPutPath);
 		writeOntology(ontologyOutPutPath, ontology);
 		
 	}
@@ -136,30 +146,86 @@ public class OntologyController {
 			return ontology;
 	}
 	
-	public OntModel addOntologyMetrics(String ontologyPath, String metric){
+	/**
+	 * add ontology metrics
+	 * @param ontologyPath
+	 * @return ontology
+	 */
+	public OntModel addOntologyMetrics(String ontologyPath){
 		OntModel ontology = this.readOntology(ontologyPath);
 		MainInterfaceController controller = new MainInterfaceController();
 		MetricsParser metrics = controller.getMetricParser();
-		Hashtable<String, Integer> mloc = metrics.getMetricNameAndValue(metric);
+		Hashtable<String, Hashtable<String, Integer>> metricHash = metrics.getAllMetrics();
+		
+		Hashtable<String, Integer> vgMetrics = metricHash.get("VG");
 		String attributeName="";
 		Individual individual = null;
-		for (int i = 0; i < mloc.size(); i++) {
+		for (int i = 0; i < vgMetrics.size(); i++) {
 			attributeName = metrics.getAttributeName().get(i);
 			individual  = ontology.getIndividual(ontologyURI + attributeName);
-			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + metric);
-			int dataPropertyValue = mloc.get(attributeName);
+			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + "VG");
+			int dataPropertyValue = vgMetrics.get(attributeName);
 			Literal literal = ontology.createTypedLiteral(dataPropertyValue);
 			individual.addProperty(dataProperty,literal);
 		}
+		
+		Hashtable<String, Integer> mlocMetrics = metricHash.get("MLOC");
+		for (int i = 0; i < mlocMetrics.size(); i++) {
+			attributeName = metrics.getAttributeName().get(i);
+			individual  = ontology.getIndividual(ontologyURI + attributeName);
+			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + "MLOC");
+			int dataPropertyValue = mlocMetrics.get(attributeName);
+			Literal literal = ontology.createTypedLiteral(dataPropertyValue);
+			individual.addProperty(dataProperty,literal);
+		}
+		Hashtable<String, Integer> nofMetrics = metricHash.get("NOF");
+		for (int i = 0; i < nofMetrics.size(); i++) {
+			attributeName = metrics.getAttributeName().get(i);
+			individual  = ontology.getIndividual(ontologyURI + attributeName);
+			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + "NOF");
+			int dataPropertyValue = nofMetrics.get(attributeName);
+			Literal literal = ontology.createTypedLiteral(dataPropertyValue);
+			individual.addProperty(dataProperty,literal);
+		}
+		Hashtable<String, Integer> nomMetrics = metricHash.get("NOM");
+		for (int i = 0; i < nomMetrics.size(); i++) {
+			attributeName = metrics.getAttributeName().get(i);
+			individual  = ontology.getIndividual(ontologyURI + attributeName);
+			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + "NOM");
+			int dataPropertyValue = nomMetrics.get(attributeName);
+			Literal literal = ontology.createTypedLiteral(dataPropertyValue);
+			individual.addProperty(dataProperty,literal);
+		}
+		
 		return ontology;
 	}
 	
-	private static void copyFileUsingStream(String sourcePath, String destPath) throws IOException {
+	public void copyFileUsingStream(String sourcePath, String destPath) throws IOException {
 		File source = new File(sourcePath);
 		File dest = new File(destPath);
 		FileUtils.copyFile(source, dest);
 	}
 	
+	public void identifyLongMethod(String ontologyInputPath) {
+		
+		OntModel ontology = this.readOntology(ontologyInputPath);
+		org.apache.jena.reasoner.Reasoner reasoner = new GenericRuleReasoner(Rule.rulesFromURL(longMethodRule));
+
+		InfModel inferredOntotlogy = ModelFactory.createInfModel(reasoner, ontology);
+		inferredOntotlogy.prepare();
+		System.out.println("ontologie inferred");
+		Model deadCodeOntology = inferredOntotlogy.getDeductionsModel();
+
+		OutputStream out;
+		try {
+			out = new FileOutputStream(longMethodOntologyURI);
+			deadCodeOntology.write(out, "RDF/XML"); 
+
+		} catch (FileNotFoundException e1) {
+
+			e1.printStackTrace();
+		}
+	}
 	
 	public MyVisitor getVisitor() {
 		return visitor;
@@ -174,5 +240,10 @@ public class OntologyController {
 
 	public void setOntologyPath(String ontologyPath) {
 		this.ontologyPath = ontologyPath;
+	}
+	
+	public static void main(String[] args) {
+		OntologyController controller = new OntologyController();
+		controller.identifyLongMethod("/home/moise/Documents/example/Test.owl");
 	}
 }

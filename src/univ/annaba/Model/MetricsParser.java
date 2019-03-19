@@ -80,6 +80,27 @@ public class MetricsParser {
 		return hashtable;
 	}
 	/**
+	 * 
+	 * @return
+	 */
+	
+	public Hashtable<String, Hashtable<String, Integer>> getAllMetrics(){
+		Hashtable<String, Hashtable<String, Integer>> allMetrics = new Hashtable<String, Hashtable<String, Integer>>();
+		allMetrics.put("VG", getMetricNameAndValue("VG"));
+		allMetrics.put("MLOC", getMetricNameAndValue("MLOC"));
+		allMetrics.put("NOF", getMetricNameAndValue("NOF"));
+		allMetrics.put("NSF", getMetricNameAndValue("NSF"));
+		allMetrics.put("NOM", getMetricNameAndValue("NOM"));
+		allMetrics.put("TLOC", getMetricNameAndValue("TLOC"));
+		allMetrics.put("LCOM", getMetricNameAndValue("LCOM"));
+		allMetrics.put("NSM", getMetricNameAndValue("NSM"));
+		allMetrics.put("SIX", getMetricNameAndValue("SIX"));
+		allMetrics.put("PAR", getMetricNameAndValue("PAR"));
+		allMetrics.put("DIT", getMetricNameAndValue("DIT"));
+		
+		return allMetrics;
+	}
+	/**
 	 * @return the attributeName
 	 */
 	public List<String> getAttributeName() {
@@ -137,7 +158,7 @@ public class MetricsParser {
 
 	public static void main(String[] args)  {
 		MetricsParser builder = new MetricsParser("/home/moise/Documents/example/Metrics.xml");
-		System.out.println(builder.getMetricNameAndValue("MLOC"));
+		System.out.println(builder.getAllMetrics().toString());
 				
 		
 	}

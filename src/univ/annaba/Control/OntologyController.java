@@ -33,34 +33,31 @@ public class OntologyController {
 		report = visitor.getConceptsReport();
 	}
 	
-	public void writeOntologyConcepts( String ontologyOutPutPath) {
-		OutputStream out = null;
+	/**
+	 * this method generate Ontology with code concepts to output file .
+	 * @param ontologyOutPutPath
+	 */
+	public void addOntologyConcepts( String ontologyOutPutPath) {
 		OntModel ontology = ModelFactory.createOntologyModel();
+		
 		try {
-			copyFileUsingStream(ontologyPath, ontologyOutPutPath);
+			if (ontologyPath.contentEquals(ontologyOutPutPath)) {
+				ontologyOutPutPath = ontologyPath;
+			}else {
+			copyFileUsingStream(ontologyPath, ontologyOutPutPath);}
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		ontology = this.addOntologyElements(ontologyOutPutPath, report);
-		try {
-			out = new FileOutputStream(ontologyOutPutPath);
-			ontology.write(out, "RDF/XML");
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}finally {
-			try {
-				out.close();
-				ontology.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
+		writeOntology(ontologyOutPutPath, ontology);
 	}
 	
+	/**
+	 * add
+	 * @param ontologyOutPutPath
+	 */
 	public void writeOntologyMetrics( String ontologyOutPutPath) {
-		OutputStream out = null;
+		
 		OntModel ontology = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
 		
 		try {
@@ -68,7 +65,16 @@ public class OntologyController {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		ontology = this.addOntologyMetrics(ontologyOutPutPath);
+		//ontology = this.addOntologyMetrics(ontologyOutPutPath,"MLOC");
+		ontology = this.addOntologyMetrics(ontologyOutPutPath,"VG");
+		//ontology = this.addOntologyMetrics(ontologyOutPutPath,"NOF");
+		//ontology = this.addOntologyMetrics(ontologyOutPutPath,"NOM");
+		writeOntology(ontologyOutPutPath, ontology);
+		
+	}
+
+	public void writeOntology(String ontologyOutPutPath, OntModel ontology) {
+		OutputStream out = null;
 		try {
 			out = new FileOutputStream(ontologyOutPutPath);
 			ontology.write(out, "RDF/XML");
@@ -83,7 +89,6 @@ public class OntologyController {
 				e.printStackTrace();
 			}
 		}
-		
 	}
 	
 	public OntModel readOntology(String ontologyInputPath) {
@@ -131,19 +136,18 @@ public class OntologyController {
 			return ontology;
 	}
 	
-	public OntModel addOntologyMetrics(String ontologyPath){
+	public OntModel addOntologyMetrics(String ontologyPath, String metric){
 		OntModel ontology = this.readOntology(ontologyPath);
 		MainInterfaceController controller = new MainInterfaceController();
-		MetricsParser metrics = controller.getParser();
-		Hashtable<String, Integer> hashtable = metrics.getMetricNameAndValue("MLOC");
+		MetricsParser metrics = controller.getMetricParser();
+		Hashtable<String, Integer> mloc = metrics.getMetricNameAndValue(metric);
 		String attributeName="";
 		Individual individual = null;
-		for (int i = 0; i < hashtable.size(); i++) {
+		for (int i = 0; i < mloc.size(); i++) {
 			attributeName = metrics.getAttributeName().get(i);
 			individual  = ontology.getIndividual(ontologyURI + attributeName);
-		
-			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + "MLOC");
-			int dataPropertyValue = hashtable.get(attributeName);
+			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + metric);
+			int dataPropertyValue = mloc.get(attributeName);
 			Literal literal = ontology.createTypedLiteral(dataPropertyValue);
 			individual.addProperty(dataProperty,literal);
 		}

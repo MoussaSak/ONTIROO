@@ -136,8 +136,9 @@ public class MetricsParser {
 	}
 
 	public static void main(String[] args)  {
-		MetricsParser builder = new MetricsParser("/home/moise/Documents/example/Metrics");
-		System.out.println(builder.getMetricNameAndValue("NOF"));
+		MetricsParser builder = new MetricsParser("/home/moise/Documents/example/Metrics.xml");
+		System.out.println(builder.getMetricNameAndValue("MLOC"));
+				
 		
 	}
 }

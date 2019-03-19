@@ -11,8 +11,8 @@ public class MainInterfaceController {
 	
 	private Hashtable<String,ArrayList<String>> conceptsReport;
 	private OntologyController ontologyController;
-	private String metricsPath = "/home/moise/Documents/example/Metrics";
-	static MetricsParser parser;
+	private String metricsPath = "/home/moise/Documents/example/Metrics.xml";
+	static MetricsParser metricParser;
 	
 	public MainInterfaceController() {
 	}
@@ -32,13 +32,13 @@ public class MainInterfaceController {
 	
 	public String generateMetricsReport() {
 		String txt;
-		parser = new MetricsParser(metricsPath);
-		txt= "Mloc: "+ parser.getMetricNameAndValue("MLOC").toString()+"\n"+
-				"NOF: "+parser.getMetricNameAndValue("NOF").toString()+"\n"+
-				"TLOC: "+parser.getMetricNameAndValue("TLOC").toString()+"\n"+
-				"Methods with Parameters: "+parser.getMetricNameAndValue("PAR").toString()+"\n"+
-				"VG: "+parser.getMetricNameAndValue("VG").toString()+"\n"+
-				"DIT"+ parser.getMetricNameAndValue("DIT").toString();
+		metricParser = new MetricsParser(metricsPath);
+		txt= "Mloc: "+ metricParser.getMetricNameAndValue("MLOC").toString()+"\n"+
+				"NOF: "+metricParser.getMetricNameAndValue("NOF").toString()+"\n"+
+				"TLOC: "+metricParser.getMetricNameAndValue("TLOC").toString()+"\n"+
+				"Methods with Parameters: "+metricParser.getMetricNameAndValue("PAR").toString()+"\n"+
+				"VG: "+metricParser.getMetricNameAndValue("VG").toString()+"\n"+
+				"DIT"+ metricParser.getMetricNameAndValue("DIT").toString();
 		return txt;
 	}
 	
@@ -56,7 +56,7 @@ public class MainInterfaceController {
 		if(myVisitor!= null){
 		ontologyController = new OntologyController(myVisitor);
 		}
-		ontologyController.writeOntologyConcepts(ontologyOutputPath);
+		ontologyController.addOntologyConcepts(ontologyOutputPath);
 	}
 	
 	public void enrichOntology(String ontologyOutputPath){
@@ -68,15 +68,15 @@ public class MainInterfaceController {
 	/**
 	 * @return the parser
 	 */
-	public MetricsParser getParser() {
-		return parser;
+	public MetricsParser getMetricParser() {
+		return metricParser;
 	}
 
 	/**
 	 * @param parser the parser to set
 	 */
-	public void setParser(MetricsParser parser) {
-		MainInterfaceController.parser = parser;
+	public void setMetricParser(MetricsParser parser) {
+		MainInterfaceController.metricParser = parser;
 	}
 	
 }

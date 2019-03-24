@@ -223,7 +223,6 @@ public class MainInterface extends JFrame {
 				text = controller.generateConceptsReport(sourceCodeFilePath);
 				conceptsEditorPane.setText(text);
 			}
-
 		});
 
 		contentPane.add(btnGenerateConcepts, "20, 10");

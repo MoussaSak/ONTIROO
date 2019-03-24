@@ -12,7 +12,7 @@ public class MainInterfaceController {
 	private Hashtable<String,ArrayList<String>> conceptsReport;
 	private OntologyController ontologyController;
 	private String metricsPath = "/home/moise/Documents/example/Metrics.xml";
-	static MetricsParser metricParser;
+	private static MetricsParser metricParser;
 	
 	public MainInterfaceController() {
 	}
@@ -22,13 +22,23 @@ public class MainInterfaceController {
 		myVisitor = new MyVisitor(sourceCodeFilePath);
 		conceptsReport = myVisitor.getConceptsReport();
 		
-		text = 	"Variables: "+this.getElements("Variables")+ 
-				"Methods: "+this.getElements("Methods") +
+		text = 	"Methods: "+this.getElements("Methods") +
 				"Classes: " +this.getElements("Classes") +
 				"Packages: " + this.getElements("Packages");
 				
 		return text;
 	}
+	 public String generateConceptsFromMR(){
+		 String text;
+		 metricParser = new MetricsParser(metricsPath);
+		 
+			
+		 text = 	"Methods: "+metricParser.getAllMethods().toString() +
+					"Classes: " +metricParser.getAllClasses().toString() +
+					"Packages: " + metricParser.getAllPackages().toString();
+					
+			return text;
+	 }
 	
 	public String generateMetricsReport() {
 		String txt;
@@ -68,7 +78,7 @@ public class MainInterfaceController {
 	/**
 	 * @return the parser
 	 */
-	public MetricsParser getMetricParser() {
+	public static MetricsParser getMetricParser() {
 		return metricParser;
 	}
 

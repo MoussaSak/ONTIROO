@@ -45,7 +45,10 @@ public class MetricsParser {
 		Element root = document.getRootElement();
 		List<?> listOfMetric = root.getChildren();
 		Iterator<?> listOfMetricIt = listOfMetric.iterator();
-		
+		attributeName.clear();
+		attributeValue.clear();
+		attributeSource.clear();
+		attributePackage.clear();
 		while (listOfMetricIt.hasNext()) {
 			Element currentModel = (Element) listOfMetricIt.next();
 			if (metric.equals(currentModel.getAttribute("id").getValue())){ 
@@ -55,14 +58,17 @@ public class MetricsParser {
 			Iterator<?> valueIt = listOflistOfvalues.iterator();
 
 			while (valueIt.hasNext()) {
-
 				Element currentCompartment = (Element) valueIt.next();
 				attributeName.add(currentCompartment.getAttribute("name").getValue());
 				attributeValue.add(currentCompartment.getAttribute("value").getValue());
 				if(currentCompartment.getAttribute("source")!= null) {
+					String className = currentCompartment.getAttribute("source").getValue();
+					if(!attributeSource.contains(className))
 				attributeSource.add(currentCompartment.getAttribute("source").getValue());
 				}
 				if(currentCompartment.getAttribute("package")!= null) {
+					String packageName = currentCompartment.getAttribute("package").getValue();
+					if(!attributePackage.contains(packageName))
 				attributePackage.add(currentCompartment.getAttribute("package").getValue());
 				}
 				}
@@ -86,20 +92,119 @@ public class MetricsParser {
 	
 	public Hashtable<String, Hashtable<String, Integer>> getAllMetrics(){
 		Hashtable<String, Hashtable<String, Integer>> allMetrics = new Hashtable<String, Hashtable<String, Integer>>();
-		allMetrics.put("VG", getMetricNameAndValue("VG"));
 		allMetrics.put("MLOC", getMetricNameAndValue("MLOC"));
-		allMetrics.put("NOF", getMetricNameAndValue("NOF"));
-		allMetrics.put("NSF", getMetricNameAndValue("NSF"));
-		allMetrics.put("NOM", getMetricNameAndValue("NOM"));
-		allMetrics.put("TLOC", getMetricNameAndValue("TLOC"));
-		allMetrics.put("LCOM", getMetricNameAndValue("LCOM"));
-		allMetrics.put("NSM", getMetricNameAndValue("NSM"));
-		allMetrics.put("SIX", getMetricNameAndValue("SIX"));
-		allMetrics.put("PAR", getMetricNameAndValue("PAR"));
-		allMetrics.put("DIT", getMetricNameAndValue("DIT"));
-		
+
 		return allMetrics;
 	}
+	
+	/**
+	 * get MLOC metric from the metrics file
+	 * @return
+	 */
+	public Hashtable<String,Integer> getMlocMetric() {
+		return getMetricNameAndValue("MLOC");
+	}
+	
+	/**
+	 * get VG (McCabe Cyclomatic Complexity) metric from the metrics file
+	 * @return
+	 */
+	public Hashtable<String,Integer> getVGMetric() {
+		return getMetricNameAndValue("VG");
+	}
+	
+	/**
+	 * get the NOF (number of fields) from the metrics file
+	 * @return
+	 */
+	public Hashtable<String,Integer> getNOFMetric() {
+		return getMetricNameAndValue("NOF");
+	}
+	
+	/**
+	 * get number NOF (Number of Static Fields) from the metrics file.
+	 * @return
+	 */
+	public Hashtable<String,Integer> getNSFMetric() {
+		return getMetricNameAndValue("NSF");
+	}
+	/**
+	 * get NOM (number of methods) from the metrics file.
+	 * @return
+	 */
+	public Hashtable<String,Integer> getNOMMetric() {
+		return getMetricNameAndValue("NOM");
+	}
+	/**
+	 * get TLOC (total line of code) from the metrcis file.
+	 * @return
+	 */
+	public String getTLOCMetric() {
+		Element root = document.getRootElement();
+		List<?> listOfMetric = root.getChildren();
+		Iterator<?> listOfMetricIt = listOfMetric.iterator();
+		String tloc = "";
+		while (listOfMetricIt.hasNext()) {
+			Element currentModel = (Element) listOfMetricIt.next();
+			if ("TLOC".equals(currentModel.getAttribute("id").getValue())){ 
+			List<?> values = currentModel.getChildren();
+			Element listOfvalues = (Element) values.get(0);
+			tloc = listOfvalues.getAttributeValue("value");
+		}
+		}
+		return tloc;
+	}
+	/**
+	 * get NSM (number of static Method) from the metrics file.
+	 * @return
+	 */
+	public Hashtable<String,Integer> getNSMMetric() {
+		return getMetricNameAndValue("NSM");
+	}
+	/**
+	 * get NOC (Number of classes) from the source file.
+	 * @return
+	 */
+	public Hashtable<String,Integer> getNOCMetric() {
+		return getMetricNameAndValue("NOC");
+	}
+	/**
+	 * get DIT (Depth of Inheritance Tree) from the metrics file.
+	 * @return
+	 */
+	public Hashtable<String,Integer> getDITMetric() {
+		return getMetricNameAndValue("DIT");
+	}
+	
+	public Hashtable<String,Integer> getPARMetric() {
+		return getMetricNameAndValue("PAR");
+	}
+	
+	/**
+	 * gets all the methods that exists within a project.
+	 * @return a List of all methods.
+	 */
+	public List<String> getAllMethods() {
+		this.getMlocMetric();
+		return this.getAttributeName();
+	}
+	/**
+	 * gets all classes that exists within a project.
+	 * @return a List of all classes.
+	 */
+	public List<String> getAllClasses() {
+		this.getVGMetric();
+		return this.getAttributeSource();
+	}
+	/**
+	 * gets all packages that exists within a project.
+	 * @return a List of Packages.
+	 */
+	public List<String> getAllPackages() {
+		this.getVGMetric();
+		return this.getAttributePackage();
+	}
+	
 	/**
 	 * @return the attributeName
 	 */
@@ -158,7 +263,9 @@ public class MetricsParser {
 
 	public static void main(String[] args)  {
 		MetricsParser builder = new MetricsParser("/home/moise/Documents/example/Metrics.xml");
-		System.out.println(builder.getAllMetrics().toString());
+		builder.getMlocMetric();
+		System.out.println(builder.getNOFMetric());
+		System.out.println(builder.getAllClasses());
 				
 		
 	}

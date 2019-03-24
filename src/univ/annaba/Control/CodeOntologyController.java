@@ -15,33 +15,28 @@ import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.rdf.model.InfModel;
 import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
-import org.apache.jena.reasoner.rulesys.Rule;
 import org.apache.jena.util.FileManager;
 
 import univ.annaba.Model.MetricsParser;
 
-public class OntologyController {
+public class CodeOntologyController {
 	protected MyVisitor visitor;
-	protected OntModel ontology;
+	protected OntModel codeOntology;
 	protected String ontologyPath = "/home/moise/Documents/example/OntoCode.owl";
 	protected String ontologyURI = "http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#";
-	protected String fanInRule = "/home/moise/Documents/example/rulefanin.txt";
-	protected String longMethodRule = "/home/moise/Documents/example/rule.txt";
-	protected String deadCodeOntologyURI = "/home/moise/Documents/example/deadCode.owl";
-	protected String longMethodOntologyURI = "/home/moise/Documents/example/Longmethod.owl";
 	
 	protected Hashtable<String, ArrayList<String>> report;
 	
 	
-	public OntologyController(MyVisitor visitor) {
+	public CodeOntologyController(MyVisitor visitor) {
 		this.visitor = visitor;
 		report = visitor.getConceptsReport();
-		ontology = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+		codeOntology = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+	}
+	
+	public CodeOntologyController() {
 	}
 	
 	/**
@@ -57,8 +52,8 @@ public class OntologyController {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		ontology = this.addOntologyElements(ontologyOutPutPath, report);
-		this.writeOntology(ontologyOutPutPath, ontology);
+		codeOntology = this.addOntologyElements(ontologyOutPutPath, report);
+		this.writeOntology(ontologyOutPutPath, codeOntology);
 	}
 	
 	/**
@@ -71,8 +66,8 @@ public class OntologyController {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		ontology = this.addOntologyMetrics(ontologyOutPutPath);
-		this.writeOntology(ontologyOutPutPath, ontology);
+		codeOntology = this.addOntologyMetrics(ontologyOutPutPath);
+		this.writeOntology(ontologyOutPutPath, codeOntology);
 		
 	}
 	/**
@@ -111,12 +106,12 @@ public class OntologyController {
 	 * @return Ontology
 	 */
 	public OntModel addOntologyElements(String ontologyPath, Hashtable<String, ArrayList<String>> report) {
-		ontology = this.readOntology(ontologyPath);
+		codeOntology = this.readOntology(ontologyPath);
 		this.addMethodsConcepts(report);
 		this.addClassesConcepts(report);
 		this.addPackagesConcepts(report);
 		this.addVariablesConcepts(report);
-		return ontology;
+		return codeOntology;
 	}
 	
 	/**
@@ -128,7 +123,7 @@ public class OntologyController {
 		if (hash.containsKey("Methods")) {
 			ArrayList<String> methods = hash.get("Methods");
 			for (int i = 0; i < methods.size(); i++) {
-					OntClass ontClass =  ontology.getOntClass(ontology.getNsPrefixURI("")+"Method");
+					OntClass ontClass =  codeOntology.getOntClass(codeOntology.getNsPrefixURI("")+"Method");
 					String method = methods.get(i);
 					ontClass.createIndividual(ontologyURI + method);
 				}
@@ -143,7 +138,7 @@ public class OntologyController {
 		if (hash.containsKey("Classes")) {
 			ArrayList<String> classes = hash.get("Classes");
 			for (int i = 0; i < classes.size(); i++) {
-					OntClass ontClass =  ontology.getOntClass(ontology.getNsPrefixURI("")+"Classs");
+					OntClass ontClass =  codeOntology.getOntClass(codeOntology.getNsPrefixURI("")+"Classs");
 					String classs = classes.get(i);
 					ontClass.createIndividual(ontologyURI + classs);
 				}
@@ -158,7 +153,7 @@ public class OntologyController {
 		if (hash.containsKey("Packages")) {
 			ArrayList<String> packages = hash.get("Packages");
 			for (int i = 0; i < packages.size(); i++) {
-					OntClass ontClass =  ontology.getOntClass(ontology.getNsPrefixURI("")+"Package");
+					OntClass ontClass =  codeOntology.getOntClass(codeOntology.getNsPrefixURI("")+"Package");
 					String packagee = packages.get(i);
 					ontClass.createIndividual(ontologyURI + packagee);
 				}
@@ -173,7 +168,7 @@ public class OntologyController {
 		if (hash.containsKey("Variables")) {
 			ArrayList<String> variables = hash.get("Variables");
 			for (int i = 0; i < variables.size(); i++) {
-					OntClass ontClass =  ontology.getOntClass(ontology.getNsPrefixURI("")+"Variable");
+					OntClass ontClass =  codeOntology.getOntClass(codeOntology.getNsPrefixURI("")+"Variable");
 					String variable = variables.get(i);
 					ontClass.createIndividual(ontologyURI + variable);
 				}
@@ -189,7 +184,7 @@ public class OntologyController {
 		this.addMethodsMetrics("VG");
 		this.addClassesMetrics("NOF");
 		this.addClassesMetrics("NOM");
-		return ontology;
+		return codeOntology;
 	}
 	/**
 	 * adds methods metrics
@@ -203,11 +198,11 @@ public class OntologyController {
 		if (!mlocMetrics.isEmpty()) {
 		for (int i = 0; i < mlocMetrics.size(); i++) {
 			attributeName = metricsParser.getAttributeName().get(i);
-			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + metric);
-			individual  = ontology.getIndividual(ontologyURI + attributeName);
+			DatatypeProperty dataProperty = codeOntology.getDatatypeProperty(ontologyURI + metric);
+			individual  = codeOntology.getIndividual(ontologyURI + attributeName);
 			if(individual!=null) {
 			int dataPropertyValue = mlocMetrics.get(attributeName);
-			Literal literal = ontology.createTypedLiteral(dataPropertyValue);
+			Literal literal = codeOntology.createTypedLiteral(dataPropertyValue);
 			individual.addProperty(dataProperty,literal);
 			}
 		}
@@ -227,10 +222,10 @@ public class OntologyController {
 		for (int i = 0; i < nomMetrics.size(); i++) {
 			attributeName = metricsParser.getAllClasses().get(i);
 			attributeName = this.removeSuffix(attributeName);
-			individual  = ontology.getIndividual(ontologyURI + attributeName);
-			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + metric);
+			individual  = codeOntology.getIndividual(ontologyURI + attributeName);
+			DatatypeProperty dataProperty = codeOntology.getDatatypeProperty(ontologyURI + metric);
 			int dataPropertyValue = nomMetrics.get(attributeName);
-			Literal literal = ontology.createTypedLiteral(dataPropertyValue);
+			Literal literal = codeOntology.createTypedLiteral(dataPropertyValue);
 			individual.addProperty(dataProperty,literal);
 		}
 		}
@@ -247,26 +242,7 @@ public class OntologyController {
 		FileUtils.copyFile(source, dest);
 	}
 	
-	public void identifyLongMethod(String ontologyInputPath) {
-		
-		OntModel ontology = this.readOntology(ontologyInputPath);
-		org.apache.jena.reasoner.Reasoner reasoner = new GenericRuleReasoner(Rule.rulesFromURL(longMethodRule));
-
-		InfModel inferredOntotlogy = ModelFactory.createInfModel(reasoner, ontology);
-		inferredOntotlogy.prepare();
-		System.out.println("ontologie inferred "+inferredOntotlogy);
-		Model deadCodeOntology = inferredOntotlogy.getDeductionsModel();
-
-		OutputStream out;
-		try {
-			out = new FileOutputStream(longMethodOntologyURI);
-			deadCodeOntology.write(out, "RDF/XML"); 
-
-		} catch (FileNotFoundException e1) {
-
-			e1.printStackTrace();
-		}
-	}
+	
 	/**
 	 * removes the <i>.java</i> suffix from the class name.
 	 * @param attributeName
@@ -298,11 +274,6 @@ public class OntologyController {
 	}
 	
 	public static void main(String[] args) {
-		OntologyController controller = new OntologyController(new MyVisitor("/home/moise/Documents/example/HelloWorld.java"));
-		if ("/home/moise/Documents/example/HelloWorld.java".contentEquals("/home/moise/Documents/example/HelloWorld.java")) {
-			System.out.println("i was runed");
-		}else {
-		System.out.println("i was left!!");
-		}
+		//CodeOntologyController controller = new CodeOntologyController(new MyVisitor("/home/moise/Documents/example/HelloWorld.java"));
 	}
 }

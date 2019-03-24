@@ -266,6 +266,11 @@ public class MainInterface extends JFrame {
 		contentPane.add(btnDetectDeadCode, "26, 16");
 
 		JButton btnGenerateBadSmells = new JButton("Generate Bad smells Ontology");
+		btnGenerateBadSmells.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+			}
+		});
 		contentPane.add(btnGenerateBadSmells, "18, 18");
 	}
 

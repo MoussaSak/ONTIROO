@@ -10,7 +10,7 @@ public class MainInterfaceController {
 	private MyVisitor myVisitor;
 	
 	private Hashtable<String,ArrayList<String>> conceptsReport;
-	private OntologyController ontologyController;
+	private CodeOntologyController ontologyController;
 	private String metricsPath = "/home/moise/Documents/example/Metrics.xml";
 	private static MetricsParser metricParser;
 	
@@ -64,7 +64,7 @@ public class MainInterfaceController {
 	
 	public void generateOntology(String ontologyOutputPath){
 		if(myVisitor!= null){
-		ontologyController = new OntologyController(myVisitor);
+		ontologyController = new CodeOntologyController(myVisitor);
 		}
 		ontologyController.addOntologyConcepts(ontologyOutputPath);
 	}

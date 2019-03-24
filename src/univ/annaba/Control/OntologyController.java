@@ -45,7 +45,7 @@ public class OntologyController {
 	}
 	
 	/**
-	 * this method generate Ontology with code concepts to output file .
+	 * This method generates Ontology with code concepts to output file .
 	 * @param ontologyOutPutPath
 	 */
 	public void addOntologyConcepts( String ontologyOutPutPath) {
@@ -62,7 +62,7 @@ public class OntologyController {
 	}
 	
 	/**
-	 * add
+	 * write the ontology metrics to output file.
 	 * @param ontologyOutPutPath
 	 */
 	public void writeOntologyMetrics( String ontologyOutPutPath) {
@@ -75,7 +75,11 @@ public class OntologyController {
 		this.writeOntology(ontologyOutPutPath, ontology);
 		
 	}
-
+	/**
+	 * write the Ontology to outputFile
+	 * @param ontologyOutPutPath
+	 * @param ontology
+	 */
 	public void writeOntology(String ontologyOutPutPath, OntModel ontology) {
 		OutputStream out = null;
 		try {
@@ -84,18 +88,12 @@ public class OntologyController {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-
-		/**  finally {
-		 
-			try {
-				out.close();
-				ontology.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}*/
 	}
-	
+	/**
+	 * read the Ontology from an input file.
+	 * @param ontologyInputPath
+	 * @return
+	 */
 	public OntModel readOntology(String ontologyInputPath) {
 		OntModel ontology= ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
 		FileManager.get().readModel(ontology, ontologyInputPath);
@@ -106,19 +104,42 @@ public class OntologyController {
 		ontology.read(in,"RDF/XML");
 		return ontology;
 	}
-	
+	/**
+	 * adds the ontology methods, classes, packages and variables concepts. 
+	 * @param ontologyPath
+	 * @param report
+	 * @return Ontology
+	 */
 	public OntModel addOntologyElements(String ontologyPath, Hashtable<String, ArrayList<String>> report) {
 		ontology = this.readOntology(ontologyPath);
+		this.addMethodsConcepts(report);
+		this.addClassesConcepts(report);
+		this.addPackagesConcepts(report);
+		this.addVariablesConcepts(report);
+		return ontology;
+	}
+	
+	/**
+	 * adds methods concepts
+	 * @param report
+	 */
+	public void addMethodsConcepts(Hashtable<String, ArrayList<String>> report) {
 		Hashtable<String, ArrayList<String>> hash = report;
-		
 		if (hash.containsKey("Methods")) {
-		ArrayList<String> methods = hash.get("Methods");
-		for (int i = 0; i < methods.size(); i++) {
-				OntClass ontClass =  ontology.getOntClass(ontology.getNsPrefixURI("")+"Method");
-				String method = methods.get(i);
-				ontClass.createIndividual(ontologyURI + method);
+			ArrayList<String> methods = hash.get("Methods");
+			for (int i = 0; i < methods.size(); i++) {
+					OntClass ontClass =  ontology.getOntClass(ontology.getNsPrefixURI("")+"Method");
+					String method = methods.get(i);
+					ontClass.createIndividual(ontologyURI + method);
+				}
 			}
-		}
+	}
+	/**
+	 * add classes concepts
+	 * @param report
+	 */
+	public void addClassesConcepts(Hashtable<String, ArrayList<String>> report) {
+		Hashtable<String, ArrayList<String>> hash = report;
 		if (hash.containsKey("Classes")) {
 			ArrayList<String> classes = hash.get("Classes");
 			for (int i = 0; i < classes.size(); i++) {
@@ -127,6 +148,13 @@ public class OntologyController {
 					ontClass.createIndividual(ontologyURI + classs);
 				}
 		}
+	}
+	/**
+	 * add packages concepts
+	 * @param report
+	 */
+	public void addPackagesConcepts(Hashtable<String, ArrayList<String>> report) {
+		Hashtable<String, ArrayList<String>> hash = report;
 		if (hash.containsKey("Packages")) {
 			ArrayList<String> packages = hash.get("Packages");
 			for (int i = 0; i < packages.size(); i++) {
@@ -135,6 +163,13 @@ public class OntologyController {
 					ontClass.createIndividual(ontologyURI + packagee);
 				}
 		}
+	}
+	/**
+	 * add variables concepts.
+	 * @param report
+	 */
+	public void addVariablesConcepts(Hashtable<String, ArrayList<String>> report) {
+		Hashtable<String, ArrayList<String>> hash = report;
 		if (hash.containsKey("Variables")) {
 			ArrayList<String> variables = hash.get("Variables");
 			for (int i = 0; i < variables.size(); i++) {
@@ -143,23 +178,32 @@ public class OntologyController {
 					ontClass.createIndividual(ontologyURI + variable);
 				}
 		}
-			return ontology;
 	}
-	
 	/**
-	 * add ontology metrics
+	 * add ontology Methods and classes metrics.
 	 * @param ontologyPath
 	 * @return ontology
 	 */
 	public OntModel addOntologyMetrics(String ontologyPath){
-		MetricsParser metrics = MainInterfaceController.getMetricParser();
+		this.addMethodsMetrics("MLOC");
+		this.addMethodsMetrics("VG");
+		this.addClassesMetrics("NOF");
+		this.addClassesMetrics("NOM");
+		return ontology;
+	}
+	/**
+	 * adds methods metrics
+	 * @param metric
+	 */
+	public void addMethodsMetrics(String metric) {
+		MetricsParser metricsParser = MainInterfaceController.getMetricParser();
 		String attributeName="";
 		Individual individual = null;
-		Hashtable<String, Integer> mlocMetrics = metrics.getMlocMetric();
+		Hashtable<String, Integer> mlocMetrics = metricsParser.getMetricNameAndValue(metric);
 		if (!mlocMetrics.isEmpty()) {
 		for (int i = 0; i < mlocMetrics.size(); i++) {
-			attributeName = metrics.getAttributeName().get(i);
-			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + "MLOC");
+			attributeName = metricsParser.getAttributeName().get(i);
+			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + metric);
 			individual  = ontology.getIndividual(ontologyURI + attributeName);
 			if(individual!=null) {
 			int dataPropertyValue = mlocMetrics.get(attributeName);
@@ -168,52 +212,35 @@ public class OntologyController {
 			}
 		}
 		}
-		
-		Hashtable<String, Integer> vgMetrics = metrics.getVGMetric();
-		if (!vgMetrics.isEmpty()) {
-		for (int i = 0; i < vgMetrics.size(); i++) {
-			attributeName = metrics.getAttributeName().get(i);
-			individual  = ontology.getIndividual(ontologyURI + attributeName);
-			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + "VG");
-			int dataPropertyValue = vgMetrics.get(attributeName);
-			Literal literal = ontology.createTypedLiteral(dataPropertyValue);
-			individual.addProperty(dataProperty,literal);
-		}
-		}
-		
-		
-		
-		Hashtable<String, Integer> nofMetrics = metrics.getNOFMetric();
-		System.out.println("the hashtable size: "+nofMetrics.size());
-		System.out.println("the classes list: "+metrics.getAllClasses().size());
-		if(!nofMetrics.isEmpty()) {
-		for (int i = 0; i < nofMetrics.size(); i++) {
-			attributeName = metrics.getAllClasses().get(i);
-			attributeName = this.removeSuffix(attributeName);
-			System.out.println("this is the Class Name: "+attributeName);
-			individual  = ontology.getIndividual(ontologyURI + attributeName);
-			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + "NOF");
-			int dataPropertyValue = nofMetrics.get(attributeName);
-			System.out.println("this is what i should get: "+attributeName+".java");
-			Literal literal = ontology.createTypedLiteral(dataPropertyValue);
-			individual.addProperty(dataProperty,literal);
-		}
-		}
-		Hashtable<String, Integer> nomMetrics = metrics.getNOMMetric();
+
+	}
+	/**
+	 * adds classes metrics
+	 * @param metric
+	 */
+	public void addClassesMetrics(String metric) {
+		MetricsParser metricsParser = MainInterfaceController.getMetricParser();
+		String attributeName="";
+		Individual individual = null;
+		Hashtable<String, Integer> nomMetrics = metricsParser.getMetricNameAndValue(metric);
 		if(!nomMetrics.isEmpty()) {
 		for (int i = 0; i < nomMetrics.size(); i++) {
-			attributeName = metrics.getAllClasses().get(i);
+			attributeName = metricsParser.getAllClasses().get(i);
 			attributeName = this.removeSuffix(attributeName);
 			individual  = ontology.getIndividual(ontologyURI + attributeName);
-			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + "NOM");
+			DatatypeProperty dataProperty = ontology.getDatatypeProperty(ontologyURI + metric);
 			int dataPropertyValue = nomMetrics.get(attributeName);
 			Literal literal = ontology.createTypedLiteral(dataPropertyValue);
 			individual.addProperty(dataProperty,literal);
 		}
 		}
-		return ontology;
 	}
-	
+	/**
+	 * copy file usig FileUtils 
+	 * @param sourcePath
+	 * @param destPath
+	 * @throws IOException
+	 */
 	public void copyFileUsingStream(String sourcePath, String destPath) throws IOException {
 		File source = new File(sourcePath);
 		File dest = new File(destPath);
@@ -272,12 +299,10 @@ public class OntologyController {
 	
 	public static void main(String[] args) {
 		OntologyController controller = new OntologyController(new MyVisitor("/home/moise/Documents/example/HelloWorld.java"));
-		OntModel model = controller.readOntology("/home/moise/Documents/example/Test.owl");
-		Individual individual = model.getIndividual("http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#getSomething");
-		DatatypeProperty dataProperty = model.getDatatypeProperty("http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#" + "VG");
-		int dataPropertyValue = 1;
-		Literal literal = model.createTypedLiteral(dataPropertyValue);
-		individual.addProperty(dataProperty,literal);
-		controller.writeOntology("/home/moise/Documents/example/Test.owl", model);	
+		if ("/home/moise/Documents/example/HelloWorld.java".contentEquals("/home/moise/Documents/example/HelloWorld.java")) {
+			System.out.println("i was runed");
+		}else {
+		System.out.println("i was left!!");
+		}
 	}
 }

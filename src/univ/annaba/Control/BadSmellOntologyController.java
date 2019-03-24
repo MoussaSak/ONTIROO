@@ -30,7 +30,6 @@ public class BadSmellOntologyController {
 		org.apache.jena.reasoner.Reasoner reasoner = new GenericRuleReasoner(Rule.rulesFromURL(longMethodRule));
 		InfModel inferredOntotlogy = ModelFactory.createInfModel(reasoner, ontology);
 		inferredOntotlogy.prepare();
-		System.out.println("ontologie inferred "+inferredOntotlogy);
 		badSmellOntology = inferredOntotlogy.getDeductionsModel();	
 		this.writeBadSmellOntology(badSmellOntologyPath);
 		return badSmellOntology;

@@ -44,10 +44,12 @@ public class MainInterface extends JFrame {
 	private JScrollPane sourceCodeScrollPane;
 	private MainInterfaceController controller;
 	private String sourceCodeFilePath = "";
-	private String ontologyOutputPath = "";
+	private String codeOntologyOutputPath = "";
+	private String badSmellOntologyOutputPath = "";
 	private String chooserPath = "/home/moise/Documents/example/";
 	private JScrollPane metricsScrollPane;
 	private JEditorPane metricsEditorPane;
+	private JTextField badSmellOntologyTextField;
 
 	/**
 	 * Launch the application.
@@ -191,7 +193,8 @@ public class MainInterface extends JFrame {
 					sourceCodeFilePath = file.getAbsolutePath();
 					sourceCodeField.setText(sourceCodeFilePath);
 				}
-				 if (rVal == JFileChooser.CANCEL_OPTION) { }
+				if (rVal == JFileChooser.CANCEL_OPTION) {
+				}
 			}
 		});
 		contentPane.add(btnLoadCode, "26, 6");
@@ -240,14 +243,16 @@ public class MainInterface extends JFrame {
 				int rVal = chooser.showSaveDialog(null);
 				if (rVal == JFileChooser.APPROVE_OPTION) {
 					File file = chooser.getSelectedFile();
-					if(file.getName().endsWith(".owl")) {
-						ontologyOutputPath = file.getPath();}
-					else {
-					ontologyOutputPath = file.getPath()+".owl";}
+					if (file.getName().endsWith(".owl")) {
+						codeOntologyOutputPath = file.getPath();
+					} else {
+						codeOntologyOutputPath = file.getPath() + ".owl";
+					}
 				}
-				 if (rVal == JFileChooser.CANCEL_OPTION) { }
-				controller.generateOntology(ontologyOutputPath);
-				ontologyTextField.setText(ontologyOutputPath);
+				if (rVal == JFileChooser.CANCEL_OPTION) {
+				}
+				controller.generateOntology(codeOntologyOutputPath);
+				ontologyTextField.setText(codeOntologyOutputPath);
 			}
 		});
 		contentPane.add(btnDetectLongMethod, "26, 14");
@@ -256,22 +261,41 @@ public class MainInterface extends JFrame {
 		contentPane.add(enrichOntologyTextField, "16, 16, 5, 1, fill, default");
 		enrichOntologyTextField.setColumns(10);
 
-		JButton btnDetectDeadCode = new JButton("Enrich Code Ontology");
-		btnDetectDeadCode.addActionListener(new ActionListener() {
+		JButton btnEnrichCodeOntology = new JButton("Enrich Code Ontology");
+		btnEnrichCodeOntology.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.enrichOntology(ontologyOutputPath);
-				enrichOntologyTextField.setText("Done! "+ontologyOutputPath);
+				controller.enrichOntology(codeOntologyOutputPath);
+				enrichOntologyTextField.setText("Done! " + codeOntologyOutputPath);
 			}
 		});
-		contentPane.add(btnDetectDeadCode, "26, 16");
+		contentPane.add(btnEnrichCodeOntology, "26, 16");
+		ontologyTextField.setColumns(10);
+		
 
 		JButton btnGenerateBadSmells = new JButton("Generate Bad smells Ontology");
 		btnGenerateBadSmells.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				JFileChooser chooser = new JFileChooser(new File(chooserPath));
+				FileFilter filter = new FileNameExtensionFilter("OWL File", "owl");
+				chooser.setFileFilter(filter);
+				int rVal = chooser.showSaveDialog(null);
+				if (rVal == JFileChooser.APPROVE_OPTION) {
+					File file = chooser.getSelectedFile();
+					if (file.getName().endsWith(".owl")) {
+						badSmellOntologyOutputPath = file.getPath();
+					} else {
+						badSmellOntologyOutputPath = file.getPath() + ".owl";
+					}
+				}
+				if (rVal == JFileChooser.CANCEL_OPTION) {
+				}
+				controller.generateBadSmellOntology(badSmellOntologyOutputPath);
+				badSmellOntologyTextField.setText("Done! "+ badSmellOntologyOutputPath);
 			}
 		});
-		contentPane.add(btnGenerateBadSmells, "18, 18");
+		badSmellOntologyTextField = new JTextField();
+		contentPane.add(badSmellOntologyTextField, "16, 18, 3, 1, fill, default");
+		contentPane.add(btnGenerateBadSmells, "20, 18");
 	}
 
 }

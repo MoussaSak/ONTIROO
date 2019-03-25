@@ -12,6 +12,7 @@ public class MainInterfaceController {
 	private Hashtable<String,ArrayList<String>> conceptsReport;
 	private CodeOntologyController ontologyController;
 	private String metricsPath = "/home/moise/Documents/example/Metrics.xml";
+	private String codeOntologyOutputPath;
 	private static MetricsParser metricParser;
 	
 	public MainInterfaceController() {
@@ -63,6 +64,7 @@ public class MainInterfaceController {
 	}
 	
 	public void generateOntology(String ontologyOutputPath){
+		this.codeOntologyOutputPath = ontologyOutputPath;
 		if(myVisitor!= null){
 		ontologyController = new CodeOntologyController(myVisitor);
 		}
@@ -87,6 +89,12 @@ public class MainInterfaceController {
 	 */
 	public void setMetricParser(MetricsParser parser) {
 		MainInterfaceController.metricParser = parser;
+	}
+
+	public void generateBadSmellOntology(String badSmellOntologyOutputPath) {
+		BadSmellOntologyController controller= new BadSmellOntologyController(badSmellOntologyOutputPath);
+		controller.identifyLongMethod(codeOntologyOutputPath);
+		controller.addConcepts();
 	}
 	
 }

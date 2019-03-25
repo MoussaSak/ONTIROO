@@ -1,36 +1,31 @@
 package univ.annaba.Control;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.InputStream;
 
-import org.apache.jena.datatypes.RDFDatatype;
-import org.apache.jena.graph.Node;
+import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.InfModel;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.RDFVisitor;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
 import org.apache.jena.reasoner.rulesys.Rule;
+import org.apache.jena.util.FileManager;
+import org.apache.jena.util.iterator.ExtendedIterator;
 
-public class BadSmellOntologyController {
-	protected Model badSmellOntology;
+
+public class BadSmellOntologyController extends OntologyController{
+	protected OntModel badSmellOntology;
 	protected String badSmellOntologyPath= "/home/moise/Documents/example/BadSmellOntology.owl";
 	protected CodeOntologyController codeOntologyController;
 	protected String longMethodRule = "/home/moise/Documents/example/rule.txt";
 	protected String fanInRule = "/home/moise/Documents/example/rulefanin.txt";
 	protected String deadCodeOntologyPath = "/home/moise/Documents/example/deadCode.owl";
+	protected String longMethodOntologyPath="/home/moise/Documents/example/longMethod.owl";
 	protected String badSmellontologyURI = "http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#";
+	protected OntClass deadCode;
+	protected OntClass longMethod;
 	
 	public BadSmellOntologyController(String badSmellOntologyPath) {
 		this.badSmellOntologyPath= badSmellOntologyPath;
@@ -39,7 +34,7 @@ public class BadSmellOntologyController {
 	}
 	
 	public void init() {
-		OntModel badSmellOntology = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+		badSmellOntology = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
 		OntClass badSmell = badSmellOntology.createClass(badSmellontologyURI+"BadSmells");
 		this.addSubClass(badSmell, "ReportRefactoringOpportunities");
 		OntClass variableLevel = this.addSubClass(badSmell, "VariableLevel");
@@ -51,11 +46,11 @@ public class BadSmellOntologyController {
 		this.addSubClass(variableLevel, "SpeculativeGenerality");
 		this.addSubClass(variableLevel, "LongParametersList");
 		this.addSubClass(methodLevel,"DuplicateCode" );
-		this.addSubClass(methodLevel, "DeadCode");
+		deadCode = this.addSubClass(methodLevel, "DeadCode");
 		this.addSubClass(methodLevel, "FeatureEnvy");
 		this.addSubClass(methodLevel, "SwitchStatements");
 		this.addSubClass(methodLevel, "MessageChains");
-		this.addSubClass(methodLevel, "LongMethod");
+		longMethod = this.addSubClass(methodLevel, "LongMethod");
 		this.addSubClass(classLevel, "ParallelInheritanceHierarchies");
 		this.addSubClass(classLevel, "DivergentChange");
 		this.addSubClass(classLevel, "LargeClass");
@@ -68,15 +63,6 @@ public class BadSmellOntologyController {
 		this.addSubClass(classLevel, "DataClass");
 		this.addSubClass(classLevel, "LazyClass");
 		this.addSubClass(classLevel, "MiddleMan");
-		
-		OutputStream out = null;
-		try {
-			out = new FileOutputStream("/home/moise/Documents/example/BadSmellOntology.owl");
-			badSmellOntology.write(out, "RDF/XML");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
 	}
 	
 	public  OntClass addSubClass(OntClass superClass, String subClassName) {
@@ -86,8 +72,24 @@ public class BadSmellOntologyController {
 		return subClass;
 	}
 	
-	public void addConcepts(String codeSmellOntologyInputPath){
-	
+	/**
+	 * create Bad Smell Ontology concepts.
+	 * @param codeOntologyInputPath
+	 * @return 
+	 */
+	public  OntModel addConcepts(){
+	OntModel longMethodOntology= ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+	FileManager.get().readModel(longMethodOntology, longMethodOntologyPath);
+	InputStream in = FileManager.get().open(longMethodOntologyPath);
+	longMethodOntology.read(in, "RDF/XML");
+	OntClass ontClass = longMethodOntology.getOntClass(badSmellontologyURI+"LongMethod");
+	ExtendedIterator<?> instances = ontClass.listInstances();
+	while (instances.hasNext()) {
+		Individual individual = (Individual) instances.next();
+		this.longMethod.createIndividual(individual.toString());
+		}
+	this.writeOntology(badSmellOntology, badSmellOntologyPath);
+	return badSmellOntology;
 	}
 	/**
 	 * identify Long Methods (more then 30 lines of code) using the code ontology and SPARQL queries.
@@ -100,25 +102,16 @@ public class BadSmellOntologyController {
 		org.apache.jena.reasoner.Reasoner reasoner = new GenericRuleReasoner(Rule.rulesFromURL(longMethodRule));
 		InfModel inferredOntotlogy = ModelFactory.createInfModel(reasoner, ontology);
 		inferredOntotlogy.prepare();
-		badSmellOntology = inferredOntotlogy.getDeductionsModel();	
-		this.writeBadSmellOntology(badSmellOntologyPath);
-		return badSmellOntology;
+		Model longMethodOntology = inferredOntotlogy.getDeductionsModel();
+		this.writeOntology(longMethodOntology, longMethodOntologyPath);
+		return longMethodOntology;
 	}
 	
-	
-	public void writeBadSmellOntology(String outputhPath){
-		OutputStream out = null;
-		try {
-			out = new FileOutputStream(outputhPath);
-			badSmellOntology.write(out, "RDF/XML");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+
 	public static void main(String[] args) {
 		BadSmellOntologyController controller= new BadSmellOntologyController("/home/moise/Documents/example/BadSmellOntology.owl");
-		//controller.identifyLongMethod("/home/moise/Documents/example/Test.owl");
-
+		controller.identifyLongMethod("/home/moise/Documents/example/Test.owl");
+		controller.addConcepts();
 	}
 
 }

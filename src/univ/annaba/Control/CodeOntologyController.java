@@ -1,11 +1,7 @@
 package univ.annaba.Control;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -17,11 +13,10 @@ import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.util.FileManager;
 
 import univ.annaba.Model.MetricsParser;
 
-public class CodeOntologyController {
+public class CodeOntologyController extends OntologyController{
 	protected MyVisitor visitor;
 	protected OntModel codeOntology;
 	protected String ontologyPath = "/home/moise/Documents/example/OntoCode.owl";
@@ -53,7 +48,7 @@ public class CodeOntologyController {
 			e1.printStackTrace();
 		}
 		codeOntology = this.addOntologyElements(ontologyOutPutPath, report);
-		this.writeOntology(ontologyOutPutPath, codeOntology);
+		this.writeOntology(codeOntology, ontologyOutPutPath);
 	}
 	
 	/**
@@ -67,38 +62,10 @@ public class CodeOntologyController {
 			e1.printStackTrace();
 		}
 		codeOntology = this.addOntologyMetrics(ontologyOutPutPath);
-		this.writeOntology(ontologyOutPutPath, codeOntology);
+		this.writeOntology(codeOntology, ontologyOutPutPath);
 		
 	}
-	/**
-	 * write the Ontology to outputFile
-	 * @param ontologyOutPutPath
-	 * @param ontology
-	 */
-	public void writeOntology(String ontologyOutPutPath, OntModel ontology) {
-		OutputStream out = null;
-		try {
-			out = new FileOutputStream(ontologyOutPutPath);
-			ontology.write(out, "RDF/XML");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	/**
-	 * read the Ontology from an input file.
-	 * @param ontologyInputPath
-	 * @return
-	 */
-	public OntModel readOntology(String ontologyInputPath) {
-		OntModel ontology= ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
-		FileManager.get().readModel(ontology, ontologyInputPath);
-		InputStream in = FileManager.get().open(ontologyInputPath);
-		if (in == null) {
-			throw new IllegalArgumentException("File: " + ontologyInputPath + " not found");
-		}
-		ontology.read(in,"RDF/XML");
-		return ontology;
-	}
+	
 	/**
 	 * adds the ontology methods, classes, packages and variables concepts. 
 	 * @param ontologyPath
@@ -273,7 +240,4 @@ public class CodeOntologyController {
 		this.ontologyPath = ontologyPath;
 	}
 	
-	public static void main(String[] args) {
-		//CodeOntologyController controller = new CodeOntologyController(new MyVisitor("/home/moise/Documents/example/HelloWorld.java"));
-	}
 }

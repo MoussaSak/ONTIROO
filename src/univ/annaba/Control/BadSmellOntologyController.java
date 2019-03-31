@@ -1,6 +1,5 @@
 package univ.annaba.Control;
 
-import java.io.InputStream;
 
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
@@ -11,18 +10,17 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
 import org.apache.jena.reasoner.rulesys.Rule;
-import org.apache.jena.util.FileManager;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
 
 public class BadSmellOntologyController extends OntologyController{
 	protected OntModel badSmellOntology;
-	protected String badSmellOntologyPath= "/home/moise/Documents/example/BadSmellOntology.owl";
+	protected String badSmellOntologyPath= "C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\BadSmellOntology.owl";
 	protected CodeOntologyController codeOntologyController;
-	protected String longMethodRule = "/home/moise/Documents/example/rule.txt";
-	protected String fanInRule = "/home/moise/Documents/example/rulefanin.txt";
-	protected String deadCodeOntologyPath = "/home/moise/Documents/example/deadCode.owl";
-	protected String longMethodOntologyPath="/home/moise/Documents/example/longMethod.owl";
+	protected String longMethodRule = "C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\rule.txt";
+	protected String fanInRule = "C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\rulefanin.txt";
+	protected String deadCodeOntologyPath = "C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\deadCode.owl";
+	protected String longMethodOntologyPath="C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\longMethod.owl";
 	protected String badSmellontologyURI = "http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#";
 	protected OntClass deadCode;
 	protected OntClass longMethod;
@@ -78,17 +76,16 @@ public class BadSmellOntologyController extends OntologyController{
 	 * @return 
 	 */
 	public  OntModel addConcepts(){
-	OntModel longMethodOntology= ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
-	FileManager.get().readModel(longMethodOntology, longMethodOntologyPath);
-	InputStream in = FileManager.get().open(longMethodOntologyPath);
-	longMethodOntology.read(in, "RDF/XML");
+	OntModel longMethodOntology = this.readOntology(longMethodOntologyPath);
 	OntClass ontClass = longMethodOntology.getOntClass(badSmellontologyURI+"LongMethod");
+	if(ontClass != null) {
 	ExtendedIterator<?> instances = ontClass.listInstances();
 	while (instances.hasNext()) {
 		Individual individual = (Individual) instances.next();
 		this.longMethod.createIndividual(individual.toString());
 		}
 	this.writeOntology(badSmellOntology, badSmellOntologyPath);
+	}
 	return badSmellOntology;
 	}
 	/**
@@ -109,8 +106,8 @@ public class BadSmellOntologyController extends OntologyController{
 	
 
 	public static void main(String[] args) {
-		BadSmellOntologyController controller= new BadSmellOntologyController("/home/moise/Documents/example/BadSmellOntology.owl");
-		controller.identifyLongMethod("/home/moise/Documents/example/Test.owl");
+		BadSmellOntologyController controller= new BadSmellOntologyController("C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\BadSmellOntology.owl");
+		controller.identifyLongMethod("C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\Test.owl");
 		controller.addConcepts();
 	}
 

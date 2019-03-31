@@ -14,12 +14,13 @@ import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.ModelFactory;
 
+
 import univ.annaba.Model.MetricsParser;
 
 public class CodeOntologyController extends OntologyController{
 	protected MyVisitor visitor;
 	protected OntModel codeOntology;
-	protected String ontologyPath = "/home/moise/Documents/example/OntoCode.owl";
+	protected String ontologyPath = "C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\OntoCode.owl";
 	protected String ontologyURI = "http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#";
 	
 	protected Hashtable<String, ArrayList<String>> report;
@@ -239,5 +240,5 @@ public class CodeOntologyController extends OntologyController{
 	public void setOntologyPath(String ontologyPath) {
 		this.ontologyPath = ontologyPath;
 	}
-	
+
 }

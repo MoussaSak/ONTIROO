@@ -11,7 +11,7 @@ public class MainInterfaceController {
 	
 	private Hashtable<String,ArrayList<String>> conceptsReport;
 	private CodeOntologyController ontologyController;
-	private String metricsPath = "/home/moise/Documents/example/Metrics.xml";
+	private String metricsPath = "C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\Metrics.xml";
 	private String codeOntologyOutputPath;
 	private static MetricsParser metricParser;
 	
@@ -23,9 +23,9 @@ public class MainInterfaceController {
 		myVisitor = new MyVisitor(sourceCodeFilePath);
 		conceptsReport = myVisitor.getConceptsReport();
 		
-		text = 	"Methods: "+this.getElements("Methods") +
-				"Classes: " +this.getElements("Classes") +
-				"Packages: " + this.getElements("Packages");
+		text = 	"Methods: \n" +this.getElements("Methods") +
+				"Classes: \n " +this.getElements("Classes") +
+				"Packages: \n " + this.getElements("Packages");
 				
 		return text;
 	}

@@ -46,7 +46,7 @@ public class MainInterface extends JFrame {
 	private String sourceCodeFilePath = "";
 	private String codeOntologyOutputPath = "";
 	private String badSmellOntologyOutputPath = "";
-	private String chooserPath = "/home/moise/Documents/example/";
+	private String chooserPath = "C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\";
 	private JScrollPane metricsScrollPane;
 	private JEditorPane metricsEditorPane;
 	private JTextField badSmellOntologyTextField;
@@ -202,7 +202,7 @@ public class MainInterface extends JFrame {
 		metricsScrollPane = new JScrollPane();
 		metricsEditorPane = new JEditorPane();
 		metricsScrollPane.setViewportView(metricsEditorPane);
-		contentPane.add(metricsScrollPane, "16, 12, fill, fill");
+		contentPane.add(metricsScrollPane, "16, 12, 2, 1, fill, fill");
 
 		JButton btnGenerateMetrics = new JButton("Generate Metrics");
 		btnGenerateMetrics.addActionListener(new ActionListener() {
@@ -270,6 +270,8 @@ public class MainInterface extends JFrame {
 		});
 		contentPane.add(btnEnrichCodeOntology, "26, 16");
 		ontologyTextField.setColumns(10);
+		badSmellOntologyTextField = new JTextField();
+		contentPane.add(badSmellOntologyTextField, "16, 18, 5, 1, fill, default");
 		
 
 		JButton btnGenerateBadSmells = new JButton("Generate Bad smells Ontology");
@@ -293,9 +295,7 @@ public class MainInterface extends JFrame {
 				badSmellOntologyTextField.setText("Done! "+ badSmellOntologyOutputPath);
 			}
 		});
-		badSmellOntologyTextField = new JTextField();
-		contentPane.add(badSmellOntologyTextField, "16, 18, 3, 1, fill, default");
-		contentPane.add(btnGenerateBadSmells, "20, 18");
+		contentPane.add(btnGenerateBadSmells, "26, 18");
 	}
 
 }

@@ -262,10 +262,10 @@ public class MetricsParser {
 	}
 
 	public static void main(String[] args)  {
-		MetricsParser builder = new MetricsParser("/home/moise/Documents/example/Metrics.xml");
-		builder.getMlocMetric();
-		System.out.println(builder.getNOFMetric());
-		System.out.println(builder.getAllClasses());
+		MetricsParser builder = new MetricsParser("C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\Metrics.xml");
+		
+		System.out.println(builder.getMetricNameAndValue("DIT"));
+		//System.out.println(builder.getAllClasses());
 				
 		
 	}

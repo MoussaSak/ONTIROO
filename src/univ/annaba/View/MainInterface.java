@@ -82,42 +82,103 @@ public class MainInterface extends JFrame {
 		menuBar.add(mnFile);
 
 		JMenuItem mntmNew = new JMenuItem("New");
+		mntmNew.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				loadCode();
+			}
+		});
 		mnFile.add(mntmNew);
 
 		JMenuItem mntmOpen = new JMenuItem("Open");
+		mntmOpen.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				loadCode();
+			}
+		});
 		mnFile.add(mntmOpen);
 
-		JMenuItem mntmSave = new JMenuItem("Save");
+		JMenuItem mntmSave = new JMenuItem("Generate Code Ontology");
+		mntmSave.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				generateCodeOntology();
+			}
+		});
 		mnFile.add(mntmSave);
 
-		JMenuItem mntmSaveAs = new JMenuItem("Save As");
+		JMenuItem mntmSaveAs = new JMenuItem("Generate Bad Smell Ontology");
+		mntmSaveAs.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				generateBadSmellOntology();
+			}
+		});
 		mnFile.add(mntmSaveAs);
 
 		JMenuItem mntmClose = new JMenuItem("Close");
+		mntmClose.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.exit(EXIT_ON_CLOSE);
+			}
+		});
 		mnFile.add(mntmClose);
 
 		JMenu mnEdit = new JMenu("Edit");
 		menuBar.add(mnEdit);
 
-		JMenuItem mntmEditConcepts = new JMenuItem("Edit Concepts");
+		JMenuItem mntmEditConcepts = new JMenuItem("Generate Concepts");
+		mntmEditConcepts.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				generateConcepts();
+			}
+		});
 		mnEdit.add(mntmEditConcepts);
 
-		JMenuItem mntmEditMetrics = new JMenuItem("Edit Metrics");
+		JMenuItem mntmEditMetrics = new JMenuItem("Generate Metrics");
+		mntmEditMetrics.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				generateMetrics();
+			}
+		});
 		mnEdit.add(mntmEditMetrics);
 
 		JMenuItem mntmEditCodeOntology = new JMenuItem("Edit Code Ontology");
+		mntmEditCodeOntology.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				generateCodeOntology();
+			}
+		});
 		mnEdit.add(mntmEditCodeOntology);
 
 		JMenuItem mntmEditBadsmellsOntology = new JMenuItem("Edit badsmells Ontology");
+		mntmEditBadsmellsOntology.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				generateBadSmellOntology();
+			}
+		});
 		mnEdit.add(mntmEditBadsmellsOntology);
 
 		JMenu mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 
-		JMenuItem mntmHelpContents = new JMenuItem("Help contents");
-		mnHelp.add(mntmHelpContents);
-
-		JMenuItem mntmAbout = new JMenuItem("About");
+		JMenuItem mntmAbout = new JMenuItem("About ONTIROO");
 		mnHelp.add(mntmAbout);
 
 		contentPane = new JPanel();
@@ -183,18 +244,7 @@ public class MainInterface extends JFrame {
 		btnLoadCode.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
-
-				JFileChooser sourceCodeChooser = new JFileChooser(new File(chooserPath));
-				FileFilter filter = new FileNameExtensionFilter("Java File", "java");
-				sourceCodeChooser.setFileFilter(filter);
-				int rVal = sourceCodeChooser.showOpenDialog(null);
-				if (rVal == JFileChooser.APPROVE_OPTION) {
-					File file = sourceCodeChooser.getSelectedFile();
-					sourceCodeFilePath = file.getAbsolutePath();
-					sourceCodeField.setText(sourceCodeFilePath);
-				}
-				if (rVal == JFileChooser.CANCEL_OPTION) {
-				}
+				loadCode();
 			}
 		});
 		contentPane.add(btnLoadCode, "26, 6");
@@ -207,8 +257,7 @@ public class MainInterface extends JFrame {
 		JButton btnGenerateMetrics = new JButton("Generate Metrics");
 		btnGenerateMetrics.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				String report = controller.generateMetricsReport();
-				metricsEditorPane.setText(report);
+				generateMetrics();
 			}
 		});
 		contentPane.add(btnGenerateMetrics, "16, 10");
@@ -221,10 +270,7 @@ public class MainInterface extends JFrame {
 		JButton btnGenerateConcepts = new JButton("Generate Concepts");
 		btnGenerateConcepts.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller = new MainInterfaceController();
-				String text = "";
-				text = controller.generateConceptsReport(sourceCodeFilePath);
-				conceptsEditorPane.setText(text);
+				generateConcepts();
 			}
 		});
 
@@ -237,22 +283,7 @@ public class MainInterface extends JFrame {
 		JButton btnDetectLongMethod = new JButton("Generate Code Ontology");
 		btnDetectLongMethod.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser chooser = new JFileChooser(new File(chooserPath));
-				FileFilter filter = new FileNameExtensionFilter("OWL File", "owl");
-				chooser.setFileFilter(filter);
-				int rVal = chooser.showSaveDialog(null);
-				if (rVal == JFileChooser.APPROVE_OPTION) {
-					File file = chooser.getSelectedFile();
-					if (file.getName().endsWith(".owl")) {
-						codeOntologyOutputPath = file.getPath();
-					} else {
-						codeOntologyOutputPath = file.getPath() + ".owl";
-					}
-				}
-				if (rVal == JFileChooser.CANCEL_OPTION) {
-				}
-				controller.generateOntology(codeOntologyOutputPath);
-				ontologyTextField.setText(codeOntologyOutputPath);
+				generateCodeOntology();
 			}
 		});
 		contentPane.add(btnDetectLongMethod, "26, 14");
@@ -264,8 +295,7 @@ public class MainInterface extends JFrame {
 		JButton btnEnrichCodeOntology = new JButton("Enrich Code Ontology");
 		btnEnrichCodeOntology.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				controller.enrichOntology(codeOntologyOutputPath);
-				enrichOntologyTextField.setText("Done! " + codeOntologyOutputPath);
+				enrichCodeOntology();
 			}
 		});
 		contentPane.add(btnEnrichCodeOntology, "26, 16");
@@ -277,25 +307,86 @@ public class MainInterface extends JFrame {
 		JButton btnGenerateBadSmells = new JButton("Generate Bad smells Ontology");
 		btnGenerateBadSmells.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser chooser = new JFileChooser(new File(chooserPath));
-				FileFilter filter = new FileNameExtensionFilter("OWL File", "owl");
-				chooser.setFileFilter(filter);
-				int rVal = chooser.showSaveDialog(null);
-				if (rVal == JFileChooser.APPROVE_OPTION) {
-					File file = chooser.getSelectedFile();
-					if (file.getName().endsWith(".owl")) {
-						badSmellOntologyOutputPath = file.getPath();
-					} else {
-						badSmellOntologyOutputPath = file.getPath() + ".owl";
-					}
-				}
-				if (rVal == JFileChooser.CANCEL_OPTION) {
-				}
-				controller.generateBadSmellOntology(badSmellOntologyOutputPath);
-				badSmellOntologyTextField.setText("Done! "+ badSmellOntologyOutputPath);
+				generateBadSmellOntology();
 			}
 		});
 		contentPane.add(btnGenerateBadSmells, "26, 18");
+	}
+	
+	/**
+	 * the button open handler 
+	 */
+	public void loadCode(){
+		JFileChooser sourceCodeChooser = new JFileChooser(new File(chooserPath));
+		FileFilter filter = new FileNameExtensionFilter("Java File", "java");
+		sourceCodeChooser.setFileFilter(filter);
+		int rVal = sourceCodeChooser.showOpenDialog(null);
+		if (rVal == JFileChooser.APPROVE_OPTION) {
+			File file = sourceCodeChooser.getSelectedFile();
+			sourceCodeFilePath = file.getAbsolutePath();
+			sourceCodeField.setText(sourceCodeFilePath);
+		}
+		if (rVal == JFileChooser.CANCEL_OPTION) {
+		}
+	}
+	/**
+	 * generates the code Ontology.
+	 */
+	public void generateCodeOntology(){
+		JFileChooser chooser = new JFileChooser(new File(chooserPath));
+		FileFilter filter = new FileNameExtensionFilter("OWL File", "owl");
+		chooser.setFileFilter(filter);
+		int rVal = chooser.showSaveDialog(null);
+		if (rVal == JFileChooser.APPROVE_OPTION) {
+			File file = chooser.getSelectedFile();
+			if (file.getName().endsWith(".owl")) {
+				codeOntologyOutputPath = file.getPath();
+			} else {
+				codeOntologyOutputPath = file.getPath() + ".owl";
+			}
+		}
+		if (rVal == JFileChooser.CANCEL_OPTION) {
+		}
+		controller.generateOntology(codeOntologyOutputPath);
+		ontologyTextField.setText(codeOntologyOutputPath);
+	}
+	/**
+	 * generate Bad Smell Ontology.
+	 */
+	public void generateBadSmellOntology() {
+		JFileChooser chooser = new JFileChooser(new File(chooserPath));
+		FileFilter filter = new FileNameExtensionFilter("OWL File", "owl");
+		chooser.setFileFilter(filter);
+		int rVal = chooser.showSaveDialog(null);
+		if (rVal == JFileChooser.APPROVE_OPTION) {
+			File file = chooser.getSelectedFile();
+			if (file.getName().endsWith(".owl")) {
+				badSmellOntologyOutputPath = file.getPath();
+			} else {
+				badSmellOntologyOutputPath = file.getPath() + ".owl";
+			}
+		}
+		if (rVal == JFileChooser.CANCEL_OPTION) {
+		}
+		controller.generateBadSmellOntology(badSmellOntologyOutputPath);
+		badSmellOntologyTextField.setText("Done! "+ badSmellOntologyOutputPath);
+	}
+	
+	public void generateMetrics() {
+		String report = controller.generateMetricsReport();
+		metricsEditorPane.setText(report);
+	}
+	
+	public void generateConcepts() {
+		controller = new MainInterfaceController();
+		String text = "";
+		text = controller.generateConceptsReport(sourceCodeFilePath);
+		conceptsEditorPane.setText(text);
+	}
+	
+	public void enrichCodeOntology() {
+		controller.enrichOntology(codeOntologyOutputPath);
+		enrichOntologyTextField.setText("Done! " + codeOntologyOutputPath);
 	}
 
 }

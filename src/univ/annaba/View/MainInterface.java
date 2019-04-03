@@ -18,7 +18,9 @@ import univ.annaba.Control.MainInterfaceController;
 import javax.swing.JLabel;
 
 import java.awt.Font;
+import java.awt.Image;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 import javax.swing.JEditorPane;
@@ -28,6 +30,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 
 public class MainInterface extends JFrame {
@@ -72,6 +75,13 @@ public class MainInterface extends JFrame {
 	 */
 	public MainInterface() {
 		setTitle("ONTIROO");
+		Image image = null;
+		try {
+			image = ImageIO.read(new File("ressources/BadSmell.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		setIconImage(image);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 961, 443);
 
@@ -155,7 +165,7 @@ public class MainInterface extends JFrame {
 		});
 		mnEdit.add(mntmEditMetrics);
 
-		JMenuItem mntmEditCodeOntology = new JMenuItem("Edit Code Ontology");
+		JMenuItem mntmEditCodeOntology = new JMenuItem("Generate Code Ontology");
 		mntmEditCodeOntology.addActionListener(new ActionListener() {
 			
 			@Override
@@ -164,8 +174,18 @@ public class MainInterface extends JFrame {
 			}
 		});
 		mnEdit.add(mntmEditCodeOntology);
+		
+		JMenuItem mntEnrichCodeOntology = new JMenuItem("Enrich Code Ontology");
+		mntmEditCodeOntology.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				enrichCodeOntology();
+			}
+		});
+		mnEdit.add(mntEnrichCodeOntology);
 
-		JMenuItem mntmEditBadsmellsOntology = new JMenuItem("Edit badsmells Ontology");
+		JMenuItem mntmEditBadsmellsOntology = new JMenuItem("Generate badsmells Ontology");
 		mntmEditBadsmellsOntology.addActionListener(new ActionListener() {
 			
 			@Override
@@ -232,7 +252,7 @@ public class MainInterface extends JFrame {
 						com.jgoodies.forms.factories.FormFactory.RELATED_GAP_ROWSPEC,
 						RowSpec.decode("default:grow"), }));
 
-		JLabel lblDetectingRefactoringOpportunities = new JLabel("Detecting Refactoring Opportunities");
+		JLabel lblDetectingRefactoringOpportunities = new JLabel("Detecting Bad Smells in Objct Oriented Code");
 		lblDetectingRefactoringOpportunities.setFont(new Font("Times New Roman", Font.PLAIN, 18));
 		contentPane.add(lblDetectingRefactoringOpportunities, "18, 2");
 

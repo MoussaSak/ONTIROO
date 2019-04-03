@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.jena.ontology.DatatypeProperty;
@@ -11,9 +12,16 @@ import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.ModelFactory;
-
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.util.FileManager;
 
 import univ.annaba.Model.MetricsParser;
 
@@ -152,6 +160,7 @@ public class CodeOntologyController extends OntologyController{
 		this.addMethodsMetrics("VG");
 		this.addClassesMetrics("NOF");
 		this.addClassesMetrics("NOM");
+		this.addClassesMetrics("DIT");
 		return codeOntology;
 	}
 	/**
@@ -239,6 +248,53 @@ public class CodeOntologyController extends OntologyController{
 
 	public void setOntologyPath(String ontologyPath) {
 		this.ontologyPath = ontologyPath;
+	}
+	
+	public void queryOntology(){
+		OntModel model3 = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);
+		FileManager.get().readModel( model3, "C:\\\\Users\\\\Administrateur\\\\Documents\\\\ONTIROO\\\\example\\\\Test.owl" );
+	   // String URI2  = "http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#";
+	  
+		String queryString = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>"+
+			    "PREFIX owl: <http://www.w3.org/2002/07/owl#>"+
+				"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"+
+				"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>"+
+				"PREFIX exRDF: <http://www.semanticweb.org/toshiba/ontologies/2017/4/untitled-ontology-77#>"
+				 +"SELECT ?method  \n"
+	             +"WHERE { \n"
+				 +"?method rdf:type exRDF:LongMethod . \n "                                       
+				 +"}";
+
+	Query query = QueryFactory.create(queryString);
+	QueryExecution qe= QueryExecutionFactory.create(query, model3);
+ 
+ 
+	List<RDFNode> result = new ArrayList<RDFNode>();
+	
+	ResultSet rs = qe.execSelect();
+	System.out.println("this is the result set: "+rs.toString()+" "+rs.getRowNumber());
+	
+	String avg ="";
+	String s="";
+	for ( ; rs.hasNext() ; )
+	{
+	  QuerySolution soln = rs.nextSolution() ;
+	  RDFNode a = soln.get("method");
+	  
+	   avg= a.asNode().getLocalName();
+	   System.out.println(avg);
+	   s= s.concat(avg +"\n");
+	   result.add(a); 			
+	   if (a!=null)
+		  {
+		System.out.println(s);; 
+		 
+	 } 
+	 }
+	}
+	public static void main(String[] args) {
+		CodeOntologyController codeOntologyController = new CodeOntologyController();
+		codeOntologyController.queryOntology();
 	}
 
 }

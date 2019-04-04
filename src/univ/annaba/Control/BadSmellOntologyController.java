@@ -110,5 +110,11 @@ public class BadSmellOntologyController extends OntologyController{
 		controller.identifyLongMethod("C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\Test.owl");
 		controller.addConcepts();
 	}
-
+	public OntModel getBadSmellOntology() {
+		return badSmellOntology;
+	}
+	
+	public void setBadSmellOntology(OntModel badSmellOntology) {
+		this.badSmellOntology = badSmellOntology;
+	}
 }

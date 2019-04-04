@@ -328,6 +328,7 @@ public class MainInterface extends JFrame {
 		btnGenerateBadSmells.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				generateBadSmellOntology();
+				new Viewer(badSmellOntologyOutputPath);
 			}
 		});
 		contentPane.add(btnGenerateBadSmells, "26, 18");

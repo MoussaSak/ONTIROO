@@ -10,18 +10,21 @@ public class MainInterfaceController {
 	private MyVisitor myVisitor;
 	
 	private Hashtable<String,ArrayList<String>> conceptsReport;
+	private Hashtable<String, Hashtable<String, Integer>> allMetrics;
 	private CodeOntologyController ontologyController;
 	private String metricsPath = "C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\Metrics.xml";
 	private String codeOntologyOutputPath;
 	private static MetricsParser metricParser;
 	
-	public MainInterfaceController() {
-	}
-	
-	public String generateConceptsReport(String sourceCodeFilePath) {
-		String text;
+	public MainInterfaceController(String sourceCodeFilePath) {
 		myVisitor = new MyVisitor(sourceCodeFilePath);
 		conceptsReport = myVisitor.getConceptsReport();
+		metricParser = new MetricsParser(metricsPath);
+		allMetrics = metricParser.getAllMetrics();
+	}
+	
+	public String generateConceptsReport() {
+		String text;
 		
 		text = 	"Methods: \n" +this.getElements("Methods") +
 				"Classes: \n " +this.getElements("Classes") +
@@ -29,27 +32,27 @@ public class MainInterfaceController {
 				
 		return text;
 	}
+	
+	
 	 public String generateConceptsFromMR(){
 		 String text;
-		 metricParser = new MetricsParser(metricsPath);
-		 
 			
 		 text = 	"Methods: "+metricParser.getAllMethods().toString() +
 					"Classes: " +metricParser.getAllClasses().toString() +
 					"Packages: " + metricParser.getAllPackages().toString();
 					
-			return text;
+		return text;
 	 }
 	
 	public String generateMetricsReport() {
 		String txt;
 		metricParser = new MetricsParser(metricsPath);
-		txt= "Mloc: "+ metricParser.getMetricNameAndValue("MLOC").toString()+"\n"+
-				"NOF: "+metricParser.getMetricNameAndValue("NOF").toString()+"\n"+
-				"TLOC: "+metricParser.getMetricNameAndValue("TLOC").toString()+"\n"+
-				"Methods with Parameters: "+metricParser.getMetricNameAndValue("PAR").toString()+"\n"+
-				"VG: "+metricParser.getMetricNameAndValue("VG").toString()+"\n"+
-				"DIT"+ metricParser.getMetricNameAndValue("DIT").toString();
+		txt= "Mloc: "+ metricParser.getMlocMetric().toString()+"\n"+
+				"NOF: "+metricParser.getNOFMetric().toString()+"\n"+
+				"TLOC: "+metricParser.getTLOCMetric().toString()+"\n"+
+				"Methods with Parameters: "+metricParser.getPARMetric().toString()+"\n"+
+				"VG: "+metricParser.getVGMetric()+"\n"+
+				"DIT"+ metricParser.getDITMetric().toString();
 		return txt;
 	}
 	
@@ -89,6 +92,14 @@ public class MainInterfaceController {
 	 */
 	public void setMetricParser(MetricsParser parser) {
 		MainInterfaceController.metricParser = parser;
+	}
+	
+	public Hashtable<String, ArrayList<String>> getConceptsReport() {
+		return conceptsReport;
+	}
+
+	public Hashtable<String, Hashtable<String, Integer>> getAllMetrics() {
+		return allMetrics;
 	}
 
 	public void generateBadSmellOntology(String badSmellOntologyOutputPath) {

@@ -5,6 +5,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -16,14 +17,16 @@ import com.jgoodies.forms.layout.RowSpec;
 import univ.annaba.Control.MainInterfaceController;
 
 import javax.swing.JLabel;
+import javax.swing.JList;
 
 import java.awt.Font;
 import java.awt.Image;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JTextField;
-import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -31,6 +34,8 @@ import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.awt.event.ActionEvent;
 
 public class MainInterface extends JFrame {
@@ -43,7 +48,6 @@ public class MainInterface extends JFrame {
 	private JTextField ontologyTextField;
 	private JTextField enrichOntologyTextField;
 	private JTextField sourceCodeField;
-	private JEditorPane conceptsEditorPane;
 	private JScrollPane sourceCodeScrollPane;
 	private MainInterfaceController controller;
 	private String sourceCodeFilePath = "";
@@ -51,8 +55,12 @@ public class MainInterface extends JFrame {
 	private String badSmellOntologyOutputPath = "";
 	private String chooserPath = "C:\\Users\\Administrateur\\Documents\\ONTIROO\\example\\";
 	private JScrollPane metricsScrollPane;
-	private JEditorPane metricsEditorPane;
 	private JTextField badSmellOntologyTextField;
+	private DefaultListModel<String> listModel;
+	private DefaultListModel<String> metricsListModel;
+	private JList<String> conceptsList;
+	private JList<String> metricsList ;
+	
 
 	/**
 	 * Launch the application.
@@ -74,6 +82,7 @@ public class MainInterface extends JFrame {
 	 * Create the frame.
 	 */
 	public MainInterface() {
+		
 		setTitle("ONTIROO");
 		Image image = null;
 		try {
@@ -96,7 +105,6 @@ public class MainInterface extends JFrame {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
 				loadCode();
 			}
 		});
@@ -270,8 +278,10 @@ public class MainInterface extends JFrame {
 		contentPane.add(btnLoadCode, "26, 6");
 
 		metricsScrollPane = new JScrollPane();
-		metricsEditorPane = new JEditorPane();
-		metricsScrollPane.setViewportView(metricsEditorPane);
+		//metricsEditorPane = new JEditorPane();
+		metricsListModel = new DefaultListModel<String>();
+		metricsList = new JList<String>(metricsListModel);
+		metricsScrollPane.setViewportView(metricsList);
 		contentPane.add(metricsScrollPane, "16, 12, 2, 1, fill, fill");
 
 		JButton btnGenerateMetrics = new JButton("Generate Metrics");
@@ -283,8 +293,9 @@ public class MainInterface extends JFrame {
 		contentPane.add(btnGenerateMetrics, "16, 10");
 
 		sourceCodeScrollPane = new JScrollPane();
-		conceptsEditorPane = new JEditorPane();
-		sourceCodeScrollPane.setViewportView(conceptsEditorPane);
+		listModel = new DefaultListModel<String>();
+		conceptsList = new JList<String>(listModel);
+		sourceCodeScrollPane.setViewportView(conceptsList);
 		contentPane.add(sourceCodeScrollPane, "20, 12, fill, fill");
 
 		JButton btnGenerateConcepts = new JButton("Generate Concepts");
@@ -394,15 +405,50 @@ public class MainInterface extends JFrame {
 	}
 	
 	public void generateMetrics() {
-		String report = controller.generateMetricsReport();
-		metricsEditorPane.setText(report);
+		
+		Hashtable<String,Hashtable<String,Integer>> report = controller.getAllMetrics();
+		
+		
+			    
+		
+			metricsListModel.add(0, "MLOC: "+report.get("MLOC").toString());
+			metricsListModel.add(1, "VG: "+report.get("VG").toString());
+			metricsListModel.add(2, "NOF: "+report.get("NOF").toString());
+			metricsListModel.add(3, "NOM: "+ report.get("NOM").toString());
+			metricsListModel.add(4, "NSM "+report.get("NSM").toString());
+			metricsListModel.add(5, "DIT: "+report.get("DIT").toString());
+			metricsListModel.add(6, "PAR"+report.get("PAR").toString());
+			  
+			
+		
+		metricsList = new JList<String>(metricsListModel);
+		//metricsTable = new JTable();
+		//metricsScrollPane.setViewportView(metricsTable);
+		//metricsEditorPane.setText(report);
 	}
 	
 	public void generateConcepts() {
-		controller = new MainInterfaceController();
-		String text = "";
-		text = controller.generateConceptsReport(sourceCodeFilePath);
-		conceptsEditorPane.setText(text);
+		controller = new MainInterfaceController(sourceCodeFilePath);
+	
+		Hashtable<String, ArrayList<String>> report = controller.getConceptsReport();
+		ArrayList<String> methods = report.get("Methods");
+		ArrayList<String> classes = report.get("Classes");
+		ArrayList<String> packages = report.get("Packages");
+		listModel.addElement("Methods : ");
+		for (int i = 0; i < methods.size(); i++) {
+			listModel.addElement(methods.get(i));
+		}
+		listModel.addElement("Classes : ");
+		for (int i = 0; i < classes.size(); i++) {
+			listModel.addElement(classes.get(i));
+		}
+		listModel.addElement("Packages : ");
+		for (int i = 0; i < packages.size(); i++) {
+			listModel.addElement(packages.get(i));
+		}
+		conceptsList = new JList<String>(listModel);
+		Border border = BorderFactory.createEmptyBorder();
+		conceptsList.setBorder(border);
 	}
 	
 	public void enrichCodeOntology() {

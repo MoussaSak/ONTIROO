@@ -92,8 +92,15 @@ public class MetricsParser {
 	
 	public Hashtable<String, Hashtable<String, Integer>> getAllMetrics(){
 		Hashtable<String, Hashtable<String, Integer>> allMetrics = new Hashtable<String, Hashtable<String, Integer>>();
-		allMetrics.put("MLOC", getMetricNameAndValue("MLOC"));
-
+		allMetrics.put("MLOC", getMlocMetric());
+		allMetrics.put("VG",getVGMetric());
+		allMetrics.put("NOF", getNOFMetric());
+		allMetrics.put("NSF",getNSFMetric());
+		//allMetrics.put("TLOC", getTLOCMetric());
+		allMetrics.put("NOM",getNOFMetric());
+		allMetrics.put("NSM",getNSMMetric());
+		allMetrics.put("DIT",getDITMetric());
+		allMetrics.put("PAR",getPARMetric());
 		return allMetrics;
 	}
 	
